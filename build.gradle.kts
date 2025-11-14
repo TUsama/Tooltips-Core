@@ -1,6 +1,3 @@
-import org.gradle.kotlin.dsl.configureEach
-import org.gradle.kotlin.dsl.register
-
 plugins {
     id("dev.isxander.modstitch.base") version "0.7.1-unstable"
 }
@@ -18,12 +15,9 @@ fun doLib(consumer: (prop: String) -> Unit){
     libVersion?.takeIf { it.isNotEmpty() }?.let { consumer }
 }
 
-val loader = when {
-    modstitch.isLoom -> "fabric"
-    modstitch.isModDevGradleRegular -> "neoforge"
-    modstitch.isModDevGradleLegacy -> "forge"
-    else -> throw IllegalStateException("Unsupported loader")
-}
+var loader: String = name.split("-")[1]
+
+
 modstitch {
     minecraftVersion = minecraft
     javaVersion = if (modstitch.isModDevGradleLegacy) 17 else 21
@@ -134,25 +128,6 @@ modstitch {
             }
 
 
-
-
-            runs.all {
-                val capitalizedName = name.replaceFirstChar(Char::uppercaseChar)
-
-                /*
-                project.tasks.named<JavaExec>("run$capitalizedName") {
-                    val toolchain = project.extensions.getByType<JavaToolchainService>()
-                    javaLauncher.set(
-                        toolchain.launcherFor {
-                            languageVersion.set(JavaLanguageVersion.of(project.modstitch.javaVersion.get()))
-                            vendor.set(JvmVendorSpec.JETBRAINS)
-                        }
-                    )
-                }
-
-                jvmArguments.add("-XX:+AllowEnhancedClassRedefinition")*/
-            }
-
             mods {
                 register("main") {
                     sourceSet(sourceSets.main.get())
@@ -182,30 +157,30 @@ modstitch {
 
 // Stonecutter constants for mod loaders.
 // See https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants
-var constraint: String = name.split("-")[1]
+
 stonecutter {
-    consts(
-        "fabric" to constraint.equals("fabric"),
-        "neoforge" to constraint.equals("neoforge"),
-        "forge" to constraint.equals("forge"),
-        "vanilla" to constraint.equals("vanilla")
-    )
+    constants.putAll(mapOf<String, Boolean>(
+        "fabric" to loader.equals("fabric"),
+        "neoforge" to loader.equals("neoforge"),
+        "forge" to loader.equals("forge"),
+        "vanilla" to loader.equals("vanilla")
+
+    ))
+
 }
 
 
 dependencies {
-    val version = 42
-    add("compileOnly", "org.projectlombok:lombok:1.18.${version}")
-    add("annotationProcessor", "org.projectlombok:lombok:1.18.${version}")
-    add("testCompileOnly", "org.projectlombok:lombok:1.18.${version}")
-    add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.${version}")
 
     doLib{
         modstitchModImplementation("maven.modrinth:nirvana-library:$loader-$minecraft-$it")
     }
 
+    prop("deps.fzzy_config_version"){
+        //modstitchModImplementation("maven.modrinth:nirvana-library:$loader-$minecraft-$it")
+    }
 
-    modstitch.loom {
-        modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:0.112.0+1.21.4")
+    prop("deps.fabricapi"){
+        modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:$it")
     }
 }

@@ -12,7 +12,7 @@ val minecraft = property("deps.minecraft") as String
 val libVersion = findProperty("deps.lib_version") as String?
 val minecraftVersionSplit = minecraft.split('.')
 fun doLib(consumer: (prop: String) -> Unit){
-    libVersion?.takeIf { it.isNotEmpty() }?.let { consumer }
+    libVersion?.takeIf { it.isNotEmpty() }?.let { consumer.invoke(it) }
 }
 
 var loader: String = name.split("-")[1]
@@ -42,11 +42,10 @@ modstitch {
         }
 
         replacementProperties.populate {
-            // You can put any other replacement properties/metadata here that
-            // modstitch doesn't initially support. Some examples below.
             put("mod_issue_tracker", property("mod_issue") as String)
             put("pack_format", when (property("deps.minecraft")) {
                 "1.20.1" -> 15
+                "1.21.1" -> 34
                 "1.21.4" -> 46
                 else -> throw IllegalArgumentException("Please store the resource pack version for ${property("deps.minecraft")} in build.gradle.kts! https://minecraft.wiki/w/Pack_format")
             }.toString())
@@ -144,13 +143,8 @@ modstitch {
         // true, it will automatically be generated.
         addMixinsToModManifest = true
 
-        configs.register("examplemod")
+        configs.register("tooltips_core")
 
-        // Most of the time you wont ever need loader specific mixins.
-        // If you do, simply make the mixin file and add it like so for the respective loader:
-        // if (isLoom) configs.register("examplemod-fabric")
-        // if (isModDevGradleRegular) configs.register("examplemod-neoforge")
-        // if (isModDevGradleLegacy) configs.register("examplemod-forge")
     }
 }
 
@@ -172,8 +166,15 @@ stonecutter {
 
 dependencies {
 
+    val version = 42
+    add("compileOnly", "org.projectlombok:lombok:1.18.${version}")
+    add("annotationProcessor", "org.projectlombok:lombok:1.18.${version}")
+    add("testCompileOnly", "org.projectlombok:lombok:1.18.${version}")
+    add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.${version}")
+
+
     doLib{
-        modstitchModImplementation("maven.modrinth:nirvana-library:$loader-$minecraft-$it")
+        modstitchModImplementation("maven.modrinth:nirvana-library:${loader}-${minecraft}-${libVersion}")
     }
 
     prop("deps.fzzy_config_version"){

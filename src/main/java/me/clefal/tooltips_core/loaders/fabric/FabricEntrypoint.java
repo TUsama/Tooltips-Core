@@ -1,7 +1,7 @@
 //? if fabric {
-package com.example.mymod.loaders.fabric;
+/*package me.clefal.tooltips_core.loaders.fabric;
 
-import com.example.mymod.ExampleMod;
+import me.clefal.tooltips_core.TooltipsCore;
 import com.mojang.logging.LogUtils;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
@@ -11,8 +11,6 @@ public class FabricEntrypoint implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("Hello from FabricEntrypoint!");
-        ExampleMod.initialize();
     }
 }
-//?}
+*///?}

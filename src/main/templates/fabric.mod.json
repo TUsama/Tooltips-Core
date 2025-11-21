@@ -7,7 +7,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.example.mymod.FabricEntrypoint"
+      "me.clefal.tooltips_core.loaders.fabric.FabricEntrypoint"
     ]
   }
 }

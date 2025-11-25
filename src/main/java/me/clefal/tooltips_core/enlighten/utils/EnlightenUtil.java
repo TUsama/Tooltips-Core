@@ -1,19 +1,15 @@
 package me.clefal.tooltips_core.enlighten.utils;
 
-import com.clefal.nirvana_lib.relocated.io.vavr.API;
 import com.clefal.nirvana_lib.relocated.io.vavr.Tuple;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Map;
-import com.clefal.nirvana_lib.relocated.io.vavr.collection.SortedMap;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Stream;
 import lombok.experimental.UtilityClass;
 import me.clefal.tooltips_core.TooltipsCore;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -25,6 +21,10 @@ public class EnlightenUtil {
     private static final Function<String, String> getEnlighten = string -> string + ".enlighten";
     private static final Function<String, String> termFinder = s -> "enlighten.term." + s;
     private Pattern group = Pattern.compile("\\[.+\\]\\(.+\\)");
+
+    public static Component reveal(Component component) {
+        return ((Component) reveal(List.of(component)).get(0));
+    }
 
     public static List<? extends FormattedText> reveal(List<? extends FormattedText> components) {
         List<FormattedText> formattedTexts = new ArrayList<>();
@@ -61,7 +61,7 @@ public class EnlightenUtil {
             });
 
             for (Component sibling : target.getSiblings()) {
-                if (sibling instanceof MutableComponent mutableComponent){
+                if (sibling instanceof MutableComponent mutableComponent) {
                     handleWholeComponent(mutableComponent, resultComponent, enlightenMap);
                 } else {
                     resultComponent.add(sibling);
@@ -75,7 +75,7 @@ public class EnlightenUtil {
         Map<String, Component> filter = enlightenMap.filter(x -> targetString.contains(x._1));
         List<String> strings = splitBySubstrings(targetString, filter.keySet().toJavaList());
         for (String s : strings) {
-            if (filter.keySet().contains(s)){
+            if (filter.keySet().contains(s)) {
                 resultComponent.add(Component.literal(s).withStyle(old.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(filter.get(s).get())))));
             } else {
                 resultComponent.add(Component.literal(s).withStyle(old));
@@ -146,7 +146,7 @@ public class EnlightenUtil {
         return result;
     }
 
-    public static boolean isEnlighten(HoverEvent event){
+    public static boolean isEnlighten(HoverEvent event) {
         return event.getAction().equals(HoverEvent.Action.SHOW_TEXT) && event.getValue(HoverEvent.Action.SHOW_TEXT).getString().contains("enlighten: ");
     }
 

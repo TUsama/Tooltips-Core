@@ -8,6 +8,9 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "GuiGraphicsInvoker",
-    "GuiGraphicsMixin"
+    "GuiGraphicsMixin",
+    "ScreenInvoker",
+    "ScreenMixin",
+    "TooltipAccessor"
   ]
 }

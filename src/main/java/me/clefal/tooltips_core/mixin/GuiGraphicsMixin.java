@@ -1,18 +1,19 @@
 package me.clefal.tooltips_core.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.gen.Accessor;
-import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -26,19 +27,27 @@ public class GuiGraphicsMixin {
     @Shadow
     private ItemStack tooltipStack;
 
-    @Inject(method = "renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;II)V", at = @At("HEAD"))
-    private void tc$renderTooltip$record1(Font font, List<Component> tooltipLines, int mouseX, int mouseY, CallbackInfo ci) {
-        SaveCurrentComponentsEvent.tryPost(tooltipLines, this.tooltipStack);
+    @WrapOperation(method = "renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;II)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltipInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;)V"))
+    private void tc$renderTooltip$record1(GuiGraphics instance, Font font, List<ClientTooltipComponent> clienttooltipcomponent1, int mouseX, int mouseY, ClientTooltipPositioner k2, Operation<Void> original, @Local(ordinal = 0, argsOnly = true) List<? extends net.minecraft.network.chat.FormattedText> tooltipLines) {
+        if (!SaveCurrentComponentsEvent.tryPost(tooltipLines, this.tooltipStack)) {
+            original.call(instance, font, tooltipLines, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE);
+        }
     }
 
-    @Inject(method = "renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/world/item/ItemStack;)V", at = @At("HEAD"))
-    private void tc$renderTooltip$record2(Font p_font, List<? extends FormattedText> tooltipLines, int p_mouseX, int p_mouseY, ItemStack stack, CallbackInfo ci) {
-        SaveCurrentComponentsEvent.tryPost(tooltipLines, this.tooltipStack);
+    @WrapOperation(method = "renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/world/item/ItemStack;)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltipInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;)V"))
+    private void tc$renderTooltip$record2(GuiGraphics instance, Font font, List<ClientTooltipComponent> clienttooltipcomponent1, int mouseX, int mouseY, ClientTooltipPositioner positioner, Operation<Void> original, @Local(ordinal = 0, argsOnly = true) List<? extends net.minecraft.network.chat.FormattedText> tooltipLines) {
+        if (!SaveCurrentComponentsEvent.tryPost(tooltipLines, this.tooltipStack)) {
+            original.call(instance, font, clienttooltipcomponent1, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE);
+        }
     }
 
-    @Inject(method = "renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V", at = @At("HEAD"))
-    private void tc$renderTooltip$record3(Font font, List<Component> tooltipLines, Optional<TooltipComponent> visualTooltipComponent, int mouseX, int mouseY, CallbackInfo ci) {
-        SaveCurrentComponentsEvent.tryPost(tooltipLines, this.tooltipStack);
+    @WrapOperation(method = "renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltipInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;)V"))
+    private void tc$renderTooltip$record3(GuiGraphics instance, Font font, List<ClientTooltipComponent> clienttooltipcomponent1, int mouseX, int mouseY, ClientTooltipPositioner positioner, Operation<Void> original, @Local(ordinal = 0, argsOnly = true) List<? extends net.minecraft.network.chat.FormattedText> tooltipLines) {
+        if (!SaveCurrentComponentsEvent.tryPost(tooltipLines, this.tooltipStack)) {
+            original.call(instance, font, clienttooltipcomponent1, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE);
+        }
     }
 
 

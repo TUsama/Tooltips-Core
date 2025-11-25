@@ -13,7 +13,5 @@ import java.util.List;
 public interface GuiGraphicsInvoker {
 
     @Invoker("renderTooltipInternal")
-    default void renderTooltipInternal(Font font, List<ClientTooltipComponent> components, int mouseX, int mouseY, ClientTooltipPositioner tooltipPositioner) {
-        throw new IllegalStateException("");
-    }
+    void tc$renderTooltipInternal(Font font, List<ClientTooltipComponent> components, int mouseX, int mouseY, ClientTooltipPositioner tooltipPositioner);
 }

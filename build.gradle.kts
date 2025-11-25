@@ -163,6 +163,12 @@ stonecutter {
 
 }
 
+val fzzyConfigVersion = findProperty("deps.fzzy_config_version")
+val fzzyMinecraftVersion = when (minecraft) {
+    "1.21.1" -> "1.21"
+    "1.21.4" -> "1.21.3"
+    else -> minecraft
+}
 
 dependencies {
 
@@ -172,14 +178,17 @@ dependencies {
     add("testCompileOnly", "org.projectlombok:lombok:1.18.${version}")
     add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.${version}")
 
+    if (modstitch.isModDevGradleLegacy) {
+        modstitchModImplementation("me.fzzyhmstrs:fzzy_config:${fzzyConfigVersion}+${fzzyMinecraftVersion}+forge")
+    } else {
+        modstitchModImplementation(("me.fzzyhmstrs:fzzy_config:${fzzyConfigVersion}+${fzzyMinecraftVersion}+neoforge"))
+    }
 
     doLib{
         modstitchModImplementation("maven.modrinth:nirvana-library:${loader}-${minecraft}-${libVersion}")
+        modstitchModRuntimeOnly("maven.modrinth:common-network:${property("deps.common_network")}")
     }
 
-    prop("deps.fzzy_config_version"){
-        //modstitchModImplementation("maven.modrinth:nirvana-library:$loader-$minecraft-$it")
-    }
 
     prop("deps.fabricapi"){
         modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:$it")

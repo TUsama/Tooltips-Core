@@ -12,5 +12,7 @@ allprojects {
         maven("https://api.modrinth.com/maven")
         maven("https://maven.fzzyhmstrs.me/")
         maven("https://thedarkcolour.github.io/KotlinForForge/")
+        maven("https://cursemaven.com")
+        maven("https://maven.theillusivec4.top/")
     }
 }

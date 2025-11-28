@@ -9,7 +9,10 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(value = Tooltip.class)
+@Mixin(value = Tooltip.class
+//? >1.20.1
+        ,remap = false
+)
 public class TooltipAccessor implements TooltipsDuck {
 
     @Mutable

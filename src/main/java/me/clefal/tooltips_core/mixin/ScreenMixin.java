@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Mixin(value = Screen.class, remap = false)
+@Mixin(value = Screen.class)
 public abstract class ScreenMixin implements ScreenDuck {
 
 
@@ -32,8 +32,6 @@ public abstract class ScreenMixin implements ScreenDuck {
     @Unique
     public List<TooltipsWidget> pendingToRemoved = new ArrayList<>();
 
-    @Shadow
-    protected abstract <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget);
 
     @Shadow
     protected abstract void removeWidget(GuiEventListener listener);

@@ -12,5 +12,8 @@
     "ScreenInvoker",
     "ScreenMixin",
     "TooltipAccessor"
+  ],
+  "mixins": [
+    "MutableComponentMixin"
   ]
 }

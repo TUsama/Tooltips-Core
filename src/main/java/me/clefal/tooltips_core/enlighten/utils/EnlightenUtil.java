@@ -1,6 +1,7 @@
 package me.clefal.tooltips_core.enlighten.utils;
 
 import com.clefal.nirvana_lib.relocated.io.vavr.Tuple;
+import com.clefal.nirvana_lib.relocated.io.vavr.Tuple2;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Map;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Stream;
 import lombok.experimental.UtilityClass;
@@ -10,6 +11,7 @@ import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.contents.TranslatableContents;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -27,63 +29,51 @@ public class EnlightenUtil {
     }
 
     public static List<? extends FormattedText> reveal(List<? extends FormattedText> components) {
-        List<FormattedText> formattedTexts = new ArrayList<>();
+        System.out.println("before loop: " + components.size());
         for (FormattedText component : components) {
             if (component instanceof MutableComponent comp && comp.getContents() instanceof TranslatableContents contents && I18n.exists(getEnlighten.apply(contents.getKey()))) {
-                formattedTexts.add(resolveEnlightenComponent(comp, Component.translatable(getEnlighten.apply(contents.getKey()))));
-            } else {
-                formattedTexts.add(component);
+                System.out.println("found enlighten, prepare to reveal");
+                resolveEnlightenComponent(comp, Component.translatable(getEnlighten.apply(contents.getKey())));
             }
         }
-
-        return formattedTexts;
+        System.out.println("after loop: " + components.size());
+        return components;
     }
 
-    private static Component resolveEnlightenComponent(MutableComponent target, Component enlighten) {
+    private static void resolveEnlightenComponent(MutableComponent target, Component enlighten) {
         Map<String, Component> enlightenMap = resolveEnlighten(enlighten);
-        List<Component> resultComponent = new ArrayList<>();
-        handleWholeComponent(target, resultComponent, enlightenMap);
-        MutableComponent empty = Component.empty();
-        for (Component component : resultComponent) {
-            empty.append(component);
-        }
-        return empty;
+        handleWholeComponent(target, enlightenMap);
     }
 
-    private static void handleWholeComponent(MutableComponent target, List<Component> resultComponent, Map<String, Component> enlightenMap) {
-        if (target.getSiblings().isEmpty()) {
-            String string = target.getString();
-            resultComponent.addAll(handleSingleSegment(target.getStyle(), enlightenMap, string));
-        } else {
-            target.getContents().visit(content -> {
-                resultComponent.addAll(handleSingleSegment(target.getStyle(), enlightenMap, content));
-                return Optional.empty();
-            });
-
-            for (Component sibling : target.getSiblings()) {
-                if (sibling instanceof MutableComponent mutableComponent) {
-                    handleWholeComponent(mutableComponent, resultComponent, enlightenMap);
-                } else {
-                    resultComponent.add(sibling);
-                }
+    private static void handleWholeComponent(MutableComponent target, Map<String, Component> enlightenMap) {
+        ((MutableComponentDuck) target).tooltips_Core$grabEligibles((style, content) -> {
+            if (enlightenMap.keySet().contains(content)){
+                return Optional.of(content);
             }
-        }
+            return Optional.empty();
+        }, Style.EMPTY)
+                .ifPresent(x -> {
+                    for (Tuple2<String, Component> stringComponentTuple2 : x) {
+                        if (stringComponentTuple2._2 instanceof MutableComponent mutableComponent){
+                            mutableComponent.withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(enlightenMap.get(stringComponentTuple2._1).get()))));
+                        }
+                    }
+                });
     }
-
-    private static List<Component> handleSingleSegment(Style old, Map<String, Component> enlightenMap, String targetString) {
-        List<Component> resultComponent = new ArrayList<>();
+/*
+    private static Map<String, Component> checkSingleSegment(Map<String, Component> enlightenMap, String targetString) {
         Map<String, Component> filter = enlightenMap.filter(x -> targetString.contains(x._1));
         List<String> strings = splitBySubstrings(targetString, filter.keySet().toJavaList());
+        boolean flag = false;
         for (String s : strings) {
-            if (filter.keySet().contains(s)) {
-                resultComponent.add(Component.literal(s).withStyle(old.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(filter.get(s).get())))));
-            } else {
-                resultComponent.add(Component.literal(s).withStyle(old));
+            if (strings.contains(s)) {
+                flag = true;
+                break;
             }
         }
-        return resultComponent;
+        return flag;
     }
-
+*/
     private static Map<String, Component> resolveEnlighten(Component component) {
         String string = component.getString();
         String[] split = string.split(",");

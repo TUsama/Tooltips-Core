@@ -6,9 +6,12 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
-@Mixin(value = Screen.class, remap = false)
+@Mixin(value = Screen.class
+        //? >1.20.1
+        ,remap = false
+)
 public interface ScreenInvoker {
-    @Invoker("addRenderableWidget") <T extends GuiEventListener & Renderable & NarratableEntry> T tc$addRenderableWidget(T widget);
+    @Invoker(value = "addRenderableWidget", remap = false) <T extends GuiEventListener & Renderable & NarratableEntry> T tc$addRenderableWidget(T widget);
 
     @Invoker("removeWidget") void tc$removeWidget(GuiEventListener listener);
 }

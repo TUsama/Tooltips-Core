@@ -171,6 +171,7 @@ val fzzyMinecraftVersion = when (minecraft) {
 }
 
 dependencies {
+    fun Dependency?.jij() = this?.also(::modstitchJiJ)
 
     val version = 42
     add("compileOnly", "org.projectlombok:lombok:1.18.${version}")
@@ -192,5 +193,26 @@ dependencies {
 
     prop("deps.fabricapi"){
         modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:$it")
+    }
+
+
+    modstitch.moddevgradle {
+        if (modstitch.isModDevGradleLegacy){
+            compileOnly("io.github.llamalad7:mixinextras-common:0.5.0")
+            implementation("io.github.llamalad7:mixinextras-forge:0.5.0").jij()
+
+/*
+            modstitchModImplementation("curse.maven:mine-and-slash-reloaded-306575:7103653")
+            modstitchModRuntimeOnly("curse.maven:dungeon-realm-1200770:7103646")
+            modstitchModImplementation("curse.maven:library-of-exile-398780:7103648")
+            modstitchModRuntimeOnly("curse.maven:playeranimator-658587:4587214")
+            modstitchModRuntimeOnly("curse.maven:the-harvest-1201731:7103642")
+            modstitchModRuntimeOnly("curse.maven:ancient-obelisks-1186288:7103644")
+*/
+
+            modstitchModImplementation("thedarkcolour:kotlinforforge:4.11.0")
+            modstitchModRuntimeOnly ("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
+            modstitchModCompileOnly ("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api")
+        }
     }
 }

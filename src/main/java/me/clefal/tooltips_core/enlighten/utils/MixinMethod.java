@@ -1,41 +1,37 @@
 package me.clefal.tooltips_core.enlighten.utils;
 
+import com.clefal.nirvana_lib.relocated.io.vavr.Tuple;
+import com.clefal.nirvana_lib.relocated.io.vavr.Tuple2;
+import com.clefal.nirvana_lib.relocated.io.vavr.collection.LinkedHashMap;
+import com.clefal.nirvana_lib.relocated.io.vavr.collection.Map;
 import lombok.experimental.UtilityClass;
 import me.clefal.tooltips_core.enlighten.base.TooltipsWidget;
 import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
 import me.clefal.tooltips_core.enlighten.handlers.TooltipsRecorder;
 import me.clefal.tooltips_core.mixin.ScreenInvoker;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.*;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @UtilityClass
 public class MixinMethod {
 
-    public static boolean wrapRenderWithTooltips(Screen screen, TooltipsWidget currentFocusTooltips, int mouseX, int mouseY) {
-        System.out.println("start wrap!");
-        //handle the in-queue tt
-        if (TooltipsRecorder.pendingTooltips != null && currentFocusTooltips == null){
-            System.out.println("wrap success!");
-            TooltipsRecorder.TooltipsRecord pendingTooltips = TooltipsRecorder.getPendingTooltips();
-            currentFocusTooltips = new TooltipsWidget(mouseX, mouseY, 5, 5, pendingTooltips.components(), pendingTooltips.itemStack(), screen);
-            ((ScreenInvoker) screen).tc$addRenderableWidget(currentFocusTooltips);
-            TooltipsRecorder.pendingTooltips = null;
+    public static @NotNull Optional<Map<String, Component>> grab(ComponentContents contents, MutableComponent compo, FormattedText.StyledContentConsumer<List<String>> acceptor, Style p_style, Map<String, Component> enlightenMap) {
+        ArrayList<Tuple2<String, Component>> tuple2s = new ArrayList<>();
+        Style style = compo.getStyle().applyTo(p_style);
+        Optional<List<String>> optional = contents.visit(acceptor, style);
+        boolean present = optional.isPresent();
+        if (present){
+            List<String> strings = optional.get();
+            for (String string : strings) {
+                tuple2s.add(Tuple.of(string, enlightenMap.get(string).get()));
+            }
         }
-        return !TooltipsRecorder.isTakenOverByTC();
-    }
-
-    public static void handleComponent(Component tooltip) {
-        System.out.println("from handleComponent");
-        tooltip = EnlightenUtil.reveal(tooltip);
-        SaveCurrentComponentsEvent.tryPost(List.of(tooltip), ItemStack.EMPTY);
-    }
-
-    public static void handleTooltips(TooltipsDuck duck) {
-        System.out.println("from handleTooltips");
-        duck.setMessage(EnlightenUtil.reveal(duck.getMessage()));
-        SaveCurrentComponentsEvent.tryPost(List.of(duck.getMessage()), ItemStack.EMPTY);
+        return Optional.of(LinkedHashMap.ofEntries(tuple2s));
     }
 }

@@ -7,11 +7,12 @@
   },
   "compatibilityLevel": "JAVA_17",
   "client": [
+    "ClientTextTooltipAccess",
     "GuiGraphicsInvoker",
     "GuiGraphicsMixin",
     "ScreenInvoker",
     "ScreenMixin",
-    "TooltipAccessor"
+    "GuiGraphicsAccessor"
   ],
   "mixins": [
     "MutableComponentMixin"

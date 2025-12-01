@@ -1,20 +1,33 @@
 package me.clefal.tooltips_core.enlighten.base;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import me.clefal.tooltips_core.TooltipsCore;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
+import me.clefal.tooltips_core.mixin.ClientTextTooltipAccess;
+import me.clefal.tooltips_core.mixin.GuiGraphicsAccessor;
 import me.clefal.tooltips_core.mixin.GuiGraphicsInvoker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.StringSplitter;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
@@ -24,20 +37,27 @@ import org.joml.Vector2ic;
 import net.neoforged.neoforge.client.ClientHooks;
 //?}
 
-import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TooltipsWidget extends AbstractWidget {
     private ItemStack itemStack;
     private Screen screen;
+    private List<? extends FormattedText> originals;
+    private List<? extends FormattedText> revealed;
     private List<ClientTooltipComponent> components;
     private MemorizedTooltipsPositioner positioner = new MemorizedTooltipsPositioner();
+    private final BiMap<Rect2i, ClientTooltipComponent> linesPosition = HashBiMap.create();
     private boolean isPositionInit = false;
     private final static ResourceLocation PIN = TooltipsCore.gui("pin");
     private boolean isDragging = false;
 
     public TooltipsWidget(int x, int y, int width, int height, List<? extends FormattedText> components, ItemStack itemStack, Screen screen) {
         super(x, y, width, height, Component.empty());
+        this.originals = tryCopy(components);
+        this.revealed = EnlightenUtil.reveal(components);
+        System.out.println("the revealed is: " + revealed);
         List<ClientTooltipComponent> clientTooltipComponents =
                 //? 1.20.1 {
                 /*ForgeHooksClient.
@@ -47,9 +67,28 @@ public class TooltipsWidget extends AbstractWidget {
 
 
 
-                        gatherTooltipComponents(itemStack, EnlightenUtil.reveal(components), x, Minecraft.getInstance().getWindow().getGuiScaledWidth(), Minecraft.getInstance().getWindow().getGuiScaledHeight(), Minecraft.getInstance().font);
+                        gatherTooltipComponents(ItemStack.EMPTY, tryCopy(this.revealed), x, Minecraft.getInstance().getWindow().getGuiScaledWidth(), Minecraft.getInstance().getWindow().getGuiScaledHeight(), Minecraft.getInstance().font);
         this.components = clientTooltipComponents;
+        FormattedText one = revealed.get(0);
+        ClientTooltipComponent skipOne = ClientTooltipComponent.create(((MutableComponent) one).copy().getVisualOrderText());
+
+        System.out.println("text: " + one);
+        System.out.println("style on init: " + Minecraft.getInstance().font.getSplitter().componentStyleAtWidth(((ClientTextTooltipAccess) skipOne).getText(), 30));
+
         this.screen = screen;
+        updateSize(Minecraft.getInstance().font);
+    }
+
+    private static List<? extends FormattedText> tryCopy(List<? extends FormattedText> originals){
+        ArrayList<FormattedText> formattedTexts = new ArrayList<>();
+        for (FormattedText original : originals) {
+            if (original instanceof Component component){
+                formattedTexts.add(component.copy());
+            } else {
+                formattedTexts.add(original);
+            }
+        }
+        return formattedTexts;
     }
 
     //this method will only be invoked in my mod ig.
@@ -75,13 +114,19 @@ public class TooltipsWidget extends AbstractWidget {
         System.out.println("mouse click: " + button);
         ScreenDuck screen1 = (ScreenDuck) screen;
         System.out.println(screen1.getAllFixed().size());
-        if (isHovered && button == 2) {
-            if (this == screen1.tc$getCurrentFocusTooltips()) {
-                screen1.addToFixed(this);
-                screen1.tc$setCurrentFocusTooltips(null);
-            } else if (screen1.getAllFixed().contains(this)) {
-                screen1.removeFromFixed(this);
+        if (isHovered) {
+            if (button == 2){
+                if (this == screen1.tc$getCurrentFocusTooltips()) {
+                    screen1.addToFixed(this);
+                    screen1.tc$setCurrentFocusTooltips(null);
+                } else if (screen1.getAllFixed().contains(this)) {
+                    screen1.removeFromFixed(this);
+                }
+            } else if (button == 0) {
+                Style styleAt = getStyleAt(mouseX, mouseY, Minecraft.getInstance().font);
+                System.out.println("the style is: " + styleAt);
             }
+
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -108,12 +153,43 @@ public class TooltipsWidget extends AbstractWidget {
         //guiGraphics.fill(getX() + width - 8, getY() - 8, getX() + width, getY(), ChatFormatting.GRAY.getColor());
     }
 
+    //from PinnedTooltips
+    public void updateSize(Font font) {
+        var width = 0;
+        var height = 0;
+        this.linesPosition.clear();
+        for (ClientTooltipComponent component : this.components) {
+            var componentWidth = component.getWidth(font);
+            var componentHeight = component.getHeight();
+            this.linesPosition.put(new Rect2i(0, height, componentWidth, componentHeight), component);
+            width = Math.max(width, componentWidth);
+            height += componentHeight;
+        }
+        System.out.println("the calc width is: " + width);
+        System.out.println("the true width is: " + this.width);
+    }
+
+    @Nullable
+    public Style getStyleAt(double mouseX, double mouseY, Font font) {
+        var relativeX = (int) (mouseX - getX());
+        System.out.println(relativeX);
+        var relativeY = (int) (mouseY - getY());
+        var line = linesPosition.keySet().stream().filter(rect -> rect.contains(relativeX, relativeY)).findFirst().orElse(null);
+        System.out.println("the rect2i is: " + line);
+        var component = linesPosition.get(line);
+        if (component instanceof ClientTextTooltipAccess textTooltip) {
+            System.out.println("found ClientTextTooltip!");
+            return font.getSplitter().componentStyleAtWidth(textTooltip.getText(), relativeX);
+        }
+        return null;
+    }
+
+
+
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
 
     }
 
-    public record DragInfo(Vector2ic from, Vector2ic to) {
 
-    }
 }

@@ -3,9 +3,12 @@ package me.clefal.tooltips_core.enlighten.utils;
 import com.clefal.nirvana_lib.relocated.io.vavr.Tuple;
 import com.clefal.nirvana_lib.relocated.io.vavr.Tuple2;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Map;
+import com.clefal.nirvana_lib.relocated.io.vavr.collection.Set;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Stream;
+import com.google.common.collect.HashBasedTable;
 import lombok.experimental.UtilityClass;
 import me.clefal.tooltips_core.TooltipsCore;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -22,43 +25,92 @@ import java.util.regex.Pattern;
 public class EnlightenUtil {
     private static final Function<String, String> getEnlighten = string -> string + ".enlighten";
     private static final Function<String, String> termFinder = s -> "enlighten.term." + s;
-    private Pattern group = Pattern.compile("\\[.+\\]\\(.+\\)");
+    private Pattern group = Pattern.compile("\\[(.+)\\]\\((.+)\\)");
 
-    public static Component reveal(Component component) {
-        return ((Component) reveal(List.of(component)).get(0));
+    public static void reveal(Component component) {
+        reveal(List.of(component));
     }
 
     public static List<? extends FormattedText> reveal(List<? extends FormattedText> components) {
-        System.out.println("before loop: " + components.size());
+        List<FormattedText> formattedTexts = new ArrayList<>();
         for (FormattedText component : components) {
-            if (component instanceof MutableComponent comp && comp.getContents() instanceof TranslatableContents contents && I18n.exists(getEnlighten.apply(contents.getKey()))) {
-                System.out.println("found enlighten, prepare to reveal");
-                resolveEnlightenComponent(comp, Component.translatable(getEnlighten.apply(contents.getKey())));
-            }
-        }
-        System.out.println("after loop: " + components.size());
-        return components;
-    }
-
-    private static void resolveEnlightenComponent(MutableComponent target, Component enlighten) {
-        Map<String, Component> enlightenMap = resolveEnlighten(enlighten);
-        handleWholeComponent(target, enlightenMap);
-    }
-
-    private static void handleWholeComponent(MutableComponent target, Map<String, Component> enlightenMap) {
-        ((MutableComponentDuck) target).tooltips_Core$grabEligibles((style, content) -> {
-            if (enlightenMap.keySet().contains(content)){
-                return Optional.of(content);
-            }
-            return Optional.empty();
-        }, Style.EMPTY)
-                .ifPresent(x -> {
-                    for (Tuple2<String, Component> stringComponentTuple2 : x) {
-                        if (stringComponentTuple2._2 instanceof MutableComponent mutableComponent){
-                            mutableComponent.withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(enlightenMap.get(stringComponentTuple2._1).get()))));
-                        }
+            if (component instanceof MutableComponent comp){
+                boolean flag = false;
+                Component newComponent;
+                if (comp.getContents() instanceof TranslatableContents contents && I18n.exists(getEnlighten.apply(contents.getKey()))){
+                    TooltipsCore.LOGGER.warn("found enlighten for {}, prepare to reveal", contents.getKey());
+                    MutableComponent mutableComponent = resolveEnlightenComponent(comp, Component.translatable(getEnlighten.apply(contents.getKey())));
+                    newComponent = mutableComponent;
+                } else {
+                    newComponent = comp/*.withStyle(Style.EMPTY.applyFormats(ChatFormatting.AQUA).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("11111222"))))*/;
+                    flag = true;
+                }
+                if (!comp.getSiblings().isEmpty()){
+                    ArrayList<Component> oldSiblings = new ArrayList<>(comp.getSiblings());
+                    //if the comp hasn't been modified, we can simply clear its siblings and add the new handled siblings to it.
+                    if (flag) comp.getSiblings().clear();
+                    for (FormattedText formattedText : reveal(oldSiblings)) {
+                        if (formattedText instanceof Component component1) newComponent.getSiblings().add(component1);
                     }
-                });
+                }
+                formattedTexts.add(newComponent);
+
+            } else {
+                formattedTexts.add(component);
+            }
+
+
+
+        }
+        System.out.println("the final list is: " + formattedTexts);
+        return formattedTexts;
+    }
+
+    private static MutableComponent resolveEnlightenComponent(MutableComponent target, Component enlighten) {
+        Map<String, Component> enlightenMap = resolveEnlighten(enlighten);
+        System.out.println("map is: " + enlightenMap);
+        return handleWholeComponent(target, enlightenMap);
+    }
+
+    private static MutableComponent handleWholeComponent(MutableComponent target, Map<String, Component> enlightenMap) {
+        Set<String> strings = enlightenMap.keySet();
+        Optional<Map<String, Component>> tuple2s = ((MutableComponentDuck) target).tooltips_Core$grabEligibles((style, content) -> {
+            List<String> javaList = strings.filter(content::contains)
+                    .toJavaList();
+            if (javaList.isEmpty()) {
+                return Optional.empty();
+            } else {
+                return Optional.of(javaList);
+            }
+        }, Style.EMPTY, enlightenMap);
+        if (tuple2s.isPresent()){
+            Map<String, Component> tuple2s1 = tuple2s.get();
+            Set<String> matched = tuple2s1.keySet();
+            MutableComponent newComp = MutableComponent.create(target.getContents());
+            String string = newComp.getString();
+            List<String> strings1 = splitBySubstrings(string, matched.toJavaList());
+            System.out.println("the split list is: " + strings1);
+            if (!strings1.isEmpty()){
+                MutableComponent beginning = Component.literal("");
+                for (int i = 0; i < strings1.size(); i++) {
+                    String s1 = strings1.get(i);
+                    if (matched.contains(s1)){
+                        beginning.append(Component.literal(s1).withStyle(/*Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s1.get(s1).get())))*/ ChatFormatting.GOLD)).withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s1.get(s1).get()))));
+                    } else {
+                        beginning.append(Component.literal(s1).withStyle(ChatFormatting.BLUE));
+                    }
+
+                }
+                return beginning;
+            } else {
+                TooltipsCore.LOGGER.warn("Fail at splitting target: {}, the result string list is empty.", target.getString());
+                return target;
+            }
+
+        } else {
+            TooltipsCore.LOGGER.debug("Component '{}' has its enlighten, but none of the enlighten can be found in its string.", target.getString());
+            return target;
+        }
     }
 /*
     private static Map<String, Component> checkSingleSegment(Map<String, Component> enlightenMap, String targetString) {
@@ -83,9 +135,11 @@ public class EnlightenUtil {
                 .map(s -> {
                     Matcher matcher = group.matcher(s);
                     matcher.find();
+                    System.out.println(matcher.group(1));
+                    System.out.println(matcher.group(2));
                     return Tuple.of(
-                            matcher.group(0),
-                            Component.translatable(termFinder.apply(matcher.group(1)))
+                            matcher.group(1),
+                            Component.translatable(termFinder.apply(matcher.group(2)))
                     );
                 })
                 .filter(tuple2 -> {

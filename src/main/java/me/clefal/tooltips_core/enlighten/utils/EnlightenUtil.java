@@ -27,31 +27,31 @@ public class EnlightenUtil {
     private static final Function<String, String> termFinder = s -> "enlighten.term." + s;
     private Pattern group = Pattern.compile("\\[(.+)\\]\\((.+)\\)");
 
-    public static void reveal(Component component) {
-        reveal(List.of(component));
+    public static List<? extends FormattedText> reveal(Component component) {
+        return reveal(List.of(component));
     }
 
     public static List<? extends FormattedText> reveal(List<? extends FormattedText> components) {
         List<FormattedText> formattedTexts = new ArrayList<>();
         for (FormattedText component : components) {
             if (component instanceof MutableComponent comp){
-                boolean flag = false;
                 Component newComponent;
                 if (comp.getContents() instanceof TranslatableContents contents && I18n.exists(getEnlighten.apply(contents.getKey()))){
                     TooltipsCore.LOGGER.warn("found enlighten for {}, prepare to reveal", contents.getKey());
                     MutableComponent mutableComponent = resolveEnlightenComponent(comp, Component.translatable(getEnlighten.apply(contents.getKey())));
                     newComponent = mutableComponent;
                 } else {
-                    newComponent = comp/*.withStyle(Style.EMPTY.applyFormats(ChatFormatting.AQUA).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("11111222"))))*/;
-                    flag = true;
+                    MutableComponent copy = comp.copy();
+                    copy.getSiblings().clear();
+                    newComponent = copy;
                 }
                 if (!comp.getSiblings().isEmpty()){
                     ArrayList<Component> oldSiblings = new ArrayList<>(comp.getSiblings());
                     //if the comp hasn't been modified, we can simply clear its siblings and add the new handled siblings to it.
-                    if (flag) comp.getSiblings().clear();
                     for (FormattedText formattedText : reveal(oldSiblings)) {
                         if (formattedText instanceof Component component1) newComponent.getSiblings().add(component1);
                     }
+
                 }
                 formattedTexts.add(newComponent);
 
@@ -95,9 +95,9 @@ public class EnlightenUtil {
                 for (int i = 0; i < strings1.size(); i++) {
                     String s1 = strings1.get(i);
                     if (matched.contains(s1)){
-                        beginning.append(Component.literal(s1).withStyle(/*Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s1.get(s1).get())))*/ ChatFormatting.GOLD)).withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s1.get(s1).get()))));
+                        beginning.append(Component.literal(s1).withStyle(target.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s1.get(s1).get()))).withUnderlined(true)));
                     } else {
-                        beginning.append(Component.literal(s1).withStyle(ChatFormatting.BLUE));
+                        beginning.append(Component.literal(s1).withStyle(target.getStyle()));
                     }
 
                 }

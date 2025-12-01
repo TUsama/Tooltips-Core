@@ -80,7 +80,7 @@ modstitch {
         prop("deps.mcp") { mcpVersion = it }
 
         configureNeoForge {
-
+            setAccessTransformers("../../src/main/resources/accesstransformer.cfg")
             runs {
                 configureEach {
                     systemProperty("neoforge.enabledGameTestNamespaces", mod_id)

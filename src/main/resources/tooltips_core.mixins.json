@@ -7,14 +7,17 @@
   },
   "compatibilityLevel": "JAVA_17",
   "client": [
+    "BakedGlyphAccessor",
+    "BakedGlyphMixin",
     "ClientTextTooltipAccess",
+    "GuiGraphicsAccessor",
     "GuiGraphicsInvoker",
     "GuiGraphicsMixin",
     "ScreenInvoker",
-    "ScreenMixin",
-    "GuiGraphicsAccessor"
+    "ScreenMixin"
   ],
   "mixins": [
+    "FontMixin",
     "MutableComponentMixin"
   ]
 }

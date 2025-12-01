@@ -4,15 +4,18 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
+import me.clefal.tooltips_core.enlighten.utils.MixinMethod;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 import java.util.List;
 
@@ -43,6 +46,15 @@ public class GuiGraphicsMixin {
         if (!SaveCurrentComponentsEvent.tryPost(tooltipLines, this.tooltipStack)) {
             original.call(instance, font, clienttooltipcomponent1, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE);
         }
+    }
+
+
+    @ModifyArg(
+            method = "renderComponentHoverEffect",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;split(Lnet/minecraft/network/chat/FormattedText;I)Ljava/util/List;")
+    )
+    private FormattedText tc$revealComponent(FormattedText text){
+        return MixinMethod.revealComponent(text);
     }
 
 

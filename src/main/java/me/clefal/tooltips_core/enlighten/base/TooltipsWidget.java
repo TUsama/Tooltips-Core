@@ -57,7 +57,6 @@ public class TooltipsWidget extends AbstractWidget {
         super(x, y, width, height, Component.empty());
         this.originals = tryCopy(components);
         this.revealed = EnlightenUtil.reveal(components);
-        System.out.println("the revealed is: " + revealed);
         List<ClientTooltipComponent> clientTooltipComponents =
                 //? 1.20.1 {
                 /*ForgeHooksClient.
@@ -67,14 +66,8 @@ public class TooltipsWidget extends AbstractWidget {
 
 
 
-                        gatherTooltipComponents(ItemStack.EMPTY, tryCopy(this.revealed), x, Minecraft.getInstance().getWindow().getGuiScaledWidth(), Minecraft.getInstance().getWindow().getGuiScaledHeight(), Minecraft.getInstance().font);
+                        gatherTooltipComponents(ItemStack.EMPTY, this.revealed, x, Minecraft.getInstance().getWindow().getGuiScaledWidth(), Minecraft.getInstance().getWindow().getGuiScaledHeight(), Minecraft.getInstance().font);
         this.components = clientTooltipComponents;
-        FormattedText one = revealed.get(0);
-        ClientTooltipComponent skipOne = ClientTooltipComponent.create(((MutableComponent) one).copy().getVisualOrderText());
-
-        System.out.println("text: " + one);
-        System.out.println("style on init: " + Minecraft.getInstance().font.getSplitter().componentStyleAtWidth(((ClientTextTooltipAccess) skipOne).getText(), 30));
-
         this.screen = screen;
         updateSize(Minecraft.getInstance().font);
     }
@@ -148,9 +141,13 @@ public class TooltipsWidget extends AbstractWidget {
             }
 
         }
-        ((GuiGraphicsInvoker) guiGraphics).tc$renderTooltipInternal(Minecraft.getInstance().font, this.components, getX(), getY(), positioner);
+        Font font = Minecraft.getInstance().font;
+        ((GuiGraphicsInvoker) guiGraphics).tc$renderTooltipInternal(font, this.components, getX(), getY(), positioner);
         guiGraphics.blit(PIN, getX() + width, getY() - 10, 5, 5, 0, 0, 32, 32, 32, 32);
-        //guiGraphics.fill(getX() + width - 8, getY() - 8, getX() + width, getY(), ChatFormatting.GRAY.getColor());
+        Style styleAt = getStyleAt(mouseX, mouseY, font);
+        if (styleAt!= null && styleAt.getHoverEvent() != null){
+            guiGraphics.renderComponentHoverEffect(font, styleAt, mouseX, mouseY);
+        }
     }
 
     //from PinnedTooltips

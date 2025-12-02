@@ -8,12 +8,15 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class TooltipsRecorder {
     @Nullable
     public static TooltipsRecord pendingTooltips;
+
+    public static List<TooltipsRecord> addToFixed = new ArrayList<>();
 
     @Nullable
     public static TooltipsRecord getPendingTooltips() {

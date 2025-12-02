@@ -32,7 +32,9 @@ public class BakedGlyphMixin {
 
     @Inject(method = "renderEffect", at = @At(value = "HEAD"), cancellable = true)
     private void tc$tickRemoveCurrent(BakedGlyph.Effect effect, Matrix4f matrix, VertexConsumer buffer, int packedLight, CallbackInfo ci) {
-        MixinMethod.tryDrawDashedLine(u0, v0, u1, v1, effect, matrix, buffer, packedLight, ci);
+        if (MixinMethod.tryDrawDashedLine(u0, v0, u1, v1, effect, matrix, buffer, packedLight)) {
+            ci.cancel();
+        }
     }
 
 }

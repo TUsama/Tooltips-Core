@@ -29,8 +29,6 @@ public abstract class ScreenMixin implements ScreenDuck {
     public TooltipsWidget currentFocusTooltips;
     @Unique
     public Set<TooltipsWidget> fixedTooltips = new HashSet<>();
-    @Unique
-    public List<TooltipsWidget> pendingToRemoved = new ArrayList<>();
 
 
     @Shadow

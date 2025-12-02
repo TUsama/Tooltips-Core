@@ -5,16 +5,14 @@ import com.clefal.nirvana_lib.relocated.io.vavr.Tuple2;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Map;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Set;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Stream;
-import com.google.common.collect.HashBasedTable;
 import lombok.experimental.UtilityClass;
 import me.clefal.tooltips_core.TooltipsCore;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -62,13 +60,11 @@ public class EnlightenUtil {
 
 
         }
-        System.out.println("the final list is: " + formattedTexts);
         return formattedTexts;
     }
 
     private static MutableComponent resolveEnlightenComponent(MutableComponent target, Component enlighten) {
         Map<String, Component> enlightenMap = resolveEnlighten(enlighten);
-        System.out.println("map is: " + enlightenMap);
         return handleWholeComponent(target, enlightenMap);
     }
 
@@ -89,7 +85,6 @@ public class EnlightenUtil {
             MutableComponent newComp = MutableComponent.create(target.getContents());
             String string = newComp.getString();
             List<String> strings1 = splitBySubstrings(string, matched.toJavaList());
-            System.out.println("the split list is: " + strings1);
             if (!strings1.isEmpty()){
                 MutableComponent beginning = Component.literal("");
                 for (int i = 0; i < strings1.size(); i++) {
@@ -135,8 +130,6 @@ public class EnlightenUtil {
                 .map(s -> {
                     Matcher matcher = group.matcher(s);
                     matcher.find();
-                    System.out.println(matcher.group(1));
-                    System.out.println(matcher.group(2));
                     return Tuple.of(
                             matcher.group(1),
                             Component.translatable(termFinder.apply(matcher.group(2)))
@@ -194,4 +187,17 @@ public class EnlightenUtil {
         return event.getAction().equals(HoverEvent.Action.SHOW_TEXT) && event.getValue(HoverEvent.Action.SHOW_TEXT).getString().contains("enlighten: ");
     }
 
+    public static Tuple2<Boolean, Component> trimEnlighten(Component text) {
+        if (text instanceof Component component) {
+            MutableComponent copy = component.copy();
+            if (copy.getContents() instanceof PlainTextContents.LiteralContents contents && contents.text().equals("enlighten: ")) {
+                MutableComponent empty = Component.empty();
+                empty.getSiblings().addAll(copy.getSiblings());
+                empty.withStyle(copy.getStyle());
+                copy = empty;
+            }
+            return Tuple.of(true, copy);
+        }
+        return Tuple.of(false, text);
+    }
 }

@@ -1,19 +1,40 @@
 package me.clefal.tooltips_core.enlighten.handlers;
 
+import com.clefal.nirvana_lib.relocated.io.vavr.Tuple2;
 import com.clefal.nirvana_lib.relocated.net.neoforged.bus.api.SubscribeEvent;
+import me.clefal.tooltips_core.enlighten.event.AddToFixedEvent;
 import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
+import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+
+import java.util.List;
 
 
 public class TooltipsListener {
 
     @SubscribeEvent
     private void grabRawTooltips(SaveCurrentComponentsEvent event) {
-        System.out.println("grab!");
         if (TooltipsRecorder.pendingTooltips == null) {
-            System.out.println("set pending tooltips!");
             TooltipsRecorder.setPendingTooltips(new TooltipsRecorder.TooltipsRecord(event.components, event.itemStack));
         }
 
+    }
+
+    @SubscribeEvent
+    private void addToFixedForEnlighten(AddToFixedEvent event) {
+        List<FormattedText> list = event.components.stream().map(x -> {
+                    if (x instanceof Component component) {
+                        Tuple2<Boolean, Component> tuple2 = EnlightenUtil.trimEnlighten(component);
+                        if (tuple2._1) {
+                            return tuple2._2;
+                        }
+                    }
+                    return x;
+                })
+                .toList();
+        //will be revealed when it becomes a widget.
+        TooltipsRecorder.addToFixed.add(new TooltipsRecorder.TooltipsRecord(list, event.itemStack));
     }
 
 

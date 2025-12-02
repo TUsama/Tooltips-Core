@@ -3,6 +3,7 @@ package me.clefal.tooltips_core.enlighten.base;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import me.clefal.tooltips_core.TooltipsCore;
+import me.clefal.tooltips_core.enlighten.event.AddToFixedEvent;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
 import me.clefal.tooltips_core.mixin.ClientTextTooltipAccess;
@@ -19,10 +20,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
@@ -104,9 +102,7 @@ public class TooltipsWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        System.out.println("mouse click: " + button);
         ScreenDuck screen1 = (ScreenDuck) screen;
-        System.out.println(screen1.getAllFixed().size());
         if (isHovered) {
             if (button == 2){
                 if (this == screen1.tc$getCurrentFocusTooltips()) {
@@ -115,11 +111,18 @@ public class TooltipsWidget extends AbstractWidget {
                 } else if (screen1.getAllFixed().contains(this)) {
                     screen1.removeFromFixed(this);
                 }
+            } else if (button == 1) {
+                screen1.removeFromFixed(this);
             } else if (button == 0) {
                 Style styleAt = getStyleAt(mouseX, mouseY, Minecraft.getInstance().font);
-                System.out.println("the style is: " + styleAt);
+                if (styleAt!= null && styleAt.getHoverEvent() != null && EnlightenUtil.isEnlighten(styleAt.getHoverEvent())){
+                    Component value = styleAt.getHoverEvent().getValue(HoverEvent.Action.SHOW_TEXT);
+                    if (value != null){
+                        TooltipsCore.clientBus.post(new AddToFixedEvent(ItemStack.EMPTY, List.of(value)));
+                    }
+                }
             }
-
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -162,20 +165,15 @@ public class TooltipsWidget extends AbstractWidget {
             width = Math.max(width, componentWidth);
             height += componentHeight;
         }
-        System.out.println("the calc width is: " + width);
-        System.out.println("the true width is: " + this.width);
     }
 
     @Nullable
     public Style getStyleAt(double mouseX, double mouseY, Font font) {
         var relativeX = (int) (mouseX - getX());
-        System.out.println(relativeX);
         var relativeY = (int) (mouseY - getY());
         var line = linesPosition.keySet().stream().filter(rect -> rect.contains(relativeX, relativeY)).findFirst().orElse(null);
-        System.out.println("the rect2i is: " + line);
         var component = linesPosition.get(line);
         if (component instanceof ClientTextTooltipAccess textTooltip) {
-            System.out.println("found ClientTextTooltip!");
             return font.getSplitter().componentStyleAtWidth(textTooltip.getText(), relativeX);
         }
         return null;

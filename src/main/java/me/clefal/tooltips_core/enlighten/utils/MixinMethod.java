@@ -37,7 +37,27 @@ public class MixinMethod {
         if (effect instanceof DashedLineEffect && effect instanceof BakedGlyphAccessor accessor) {
             float x0 = accessor.getX0();
             float x1 = Math.max(2 + accessor.getX0(), accessor.getX1() - 3);
+            //? 1.20.1 {
+            /*buffer.vertex(matrix, x0, accessor.getY0(), accessor.getDepth())
+                    .color(accessor.getR(), accessor.getG(), accessor.getB(), accessor.getA())
+                    .uv(u0, v0)
+                    .uv2(packedLight).endVertex();
 
+            buffer.vertex(matrix, x1, accessor.getY0(), accessor.getDepth())
+                    .color(accessor.getR(), accessor.getG(), accessor.getB(), accessor.getA())
+                    .uv(u0, v1)
+                    .uv2(packedLight).endVertex();
+
+            buffer.vertex(matrix, x1, accessor.getY1(), accessor.getDepth())
+                    .color(accessor.getR(), accessor.getG(), accessor.getB(), accessor.getA())
+                    .uv(u1, v1)
+                    .uv2(packedLight).endVertex();
+
+            buffer.vertex(matrix, x0, accessor.getY1(), accessor.getDepth())
+                    .color(accessor.getR(), accessor.getG(), accessor.getB(), accessor.getA())
+                    .uv(u1, v0)
+                    .uv2(packedLight).endVertex();
+            *///?} else {
             buffer.addVertex(matrix, x0, accessor.getY0(), accessor.getDepth())
                     .setColor(accessor.getR(), accessor.getG(), accessor.getB(), accessor.getA())
                     .setUv(u0, v0)
@@ -57,6 +77,8 @@ public class MixinMethod {
                     .setColor(accessor.getR(), accessor.getG(), accessor.getB(), accessor.getA())
                     .setUv(u1, v0)
                     .setLight(packedLight);
+            //?}
+
 
             return true;
         }

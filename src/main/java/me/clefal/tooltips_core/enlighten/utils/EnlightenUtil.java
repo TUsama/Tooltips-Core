@@ -9,7 +9,13 @@ import lombok.experimental.UtilityClass;
 import me.clefal.tooltips_core.TooltipsCore;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.*;
+        //? 1.20.1 {
+/*import net.minecraft.network.chat.contents.LiteralContents;
+        *///?} else {
 import net.minecraft.network.chat.contents.PlainTextContents;
+        //?}
+
+
 import net.minecraft.network.chat.contents.TranslatableContents;
 
 import java.util.ArrayList;
@@ -32,9 +38,9 @@ public class EnlightenUtil {
     public static List<? extends FormattedText> reveal(List<? extends FormattedText> components) {
         List<FormattedText> formattedTexts = new ArrayList<>();
         for (FormattedText component : components) {
-            if (component instanceof MutableComponent comp){
+            if (component instanceof MutableComponent comp) {
                 Component newComponent;
-                if (comp.getContents() instanceof TranslatableContents contents && I18n.exists(getEnlighten.apply(contents.getKey()))){
+                if (comp.getContents() instanceof TranslatableContents contents && I18n.exists(getEnlighten.apply(contents.getKey()))) {
                     TooltipsCore.LOGGER.warn("found enlighten for {}, prepare to reveal", contents.getKey());
                     MutableComponent mutableComponent = resolveEnlightenComponent(comp, Component.translatable(getEnlighten.apply(contents.getKey())));
                     newComponent = mutableComponent;
@@ -43,7 +49,7 @@ public class EnlightenUtil {
                     copy.getSiblings().clear();
                     newComponent = copy;
                 }
-                if (!comp.getSiblings().isEmpty()){
+                if (!comp.getSiblings().isEmpty()) {
                     ArrayList<Component> oldSiblings = new ArrayList<>(comp.getSiblings());
                     //if the comp hasn't been modified, we can simply clear its siblings and add the new handled siblings to it.
                     for (FormattedText formattedText : reveal(oldSiblings)) {
@@ -56,7 +62,6 @@ public class EnlightenUtil {
             } else {
                 formattedTexts.add(component);
             }
-
 
 
         }
@@ -79,17 +84,17 @@ public class EnlightenUtil {
                 return Optional.of(javaList);
             }
         }, Style.EMPTY, enlightenMap);
-        if (tuple2s.isPresent()){
+        if (tuple2s.isPresent()) {
             Map<String, Component> tuple2s1 = tuple2s.get();
             Set<String> matched = tuple2s1.keySet();
             MutableComponent newComp = MutableComponent.create(target.getContents());
             String string = newComp.getString();
             List<String> strings1 = splitBySubstrings(string, matched.toJavaList());
-            if (!strings1.isEmpty()){
+            if (!strings1.isEmpty()) {
                 MutableComponent beginning = Component.literal("");
                 for (int i = 0; i < strings1.size(); i++) {
                     String s1 = strings1.get(i);
-                    if (matched.contains(s1)){
+                    if (matched.contains(s1)) {
                         beginning.append(Component.literal(s1).withStyle(target.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s1.get(s1).get()))).withUnderlined(true)));
                     } else {
                         beginning.append(Component.literal(s1).withStyle(target.getStyle()));
@@ -107,20 +112,21 @@ public class EnlightenUtil {
             return target;
         }
     }
-/*
-    private static Map<String, Component> checkSingleSegment(Map<String, Component> enlightenMap, String targetString) {
-        Map<String, Component> filter = enlightenMap.filter(x -> targetString.contains(x._1));
-        List<String> strings = splitBySubstrings(targetString, filter.keySet().toJavaList());
-        boolean flag = false;
-        for (String s : strings) {
-            if (strings.contains(s)) {
-                flag = true;
-                break;
+
+    /*
+        private static Map<String, Component> checkSingleSegment(Map<String, Component> enlightenMap, String targetString) {
+            Map<String, Component> filter = enlightenMap.filter(x -> targetString.contains(x._1));
+            List<String> strings = splitBySubstrings(targetString, filter.keySet().toJavaList());
+            boolean flag = false;
+            for (String s : strings) {
+                if (strings.contains(s)) {
+                    flag = true;
+                    break;
+                }
             }
+            return flag;
         }
-        return flag;
-    }
-*/
+    */
     private static Map<String, Component> resolveEnlighten(Component component) {
         String string = component.getString();
         String[] split = string.split(",");
@@ -188,14 +194,18 @@ public class EnlightenUtil {
     }
 
     public static Tuple2<Boolean, Component> trimEnlighten(Component text) {
-        if (text instanceof Component component) {
-            MutableComponent copy = component.copy();
-            if (copy.getContents() instanceof PlainTextContents.LiteralContents contents && contents.text().equals("enlighten: ")) {
-                MutableComponent empty = Component.empty();
-                empty.getSiblings().addAll(copy.getSiblings());
-                empty.withStyle(copy.getStyle());
-                copy = empty;
-            }
+        MutableComponent copy = text.copy();
+        //? 1.20.1 {
+        /*if (copy.getContents() instanceof LiteralContents contents && contents.text().equals("enlighten: "))
+            *///?} else {
+        if (copy.getContents() instanceof PlainTextContents.LiteralContents contents && contents.text().equals("enlighten: "))
+        //?}
+
+        {
+            MutableComponent empty = Component.empty();
+            empty.getSiblings().addAll(copy.getSiblings());
+            empty.withStyle(copy.getStyle());
+            copy = empty;
             return Tuple.of(true, copy);
         }
         return Tuple.of(false, text);

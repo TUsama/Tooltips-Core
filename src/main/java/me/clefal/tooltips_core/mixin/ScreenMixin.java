@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -15,25 +16,35 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Mixin(value = Screen.class)
 public abstract class ScreenMixin implements ScreenDuck {
-
-
     @Unique
     @Nullable
     public TooltipsWidget currentFocusTooltips;
     @Unique
-    public Set<TooltipsWidget> fixedTooltips = new HashSet<>();
+    public LinkedHashSet<TooltipsWidget> fixedTooltips = new LinkedHashSet<>();
+    @Shadow
+    @Final
+    public List<Renderable> renderables;
+    @Shadow
+    @Final
+    private List<GuiEventListener> children;
+    @Shadow
+    @Final
+    private List<NarratableEntry> narratables;
 
+    @Override
+    public <T extends GuiEventListener & Renderable & NarratableEntry> T addFirstRenderableWidget(T widget) {
+        this.renderables.add(0, widget);
+        this.children.add(0, widget);
+        this.narratables.add(0, widget);
+        return widget;
+    }
 
     @Shadow
     protected abstract void removeWidget(GuiEventListener listener);
-
 
     @Unique
     public TooltipsWidget tc$getCurrentFocusTooltips() {
@@ -52,7 +63,11 @@ public abstract class ScreenMixin implements ScreenDuck {
 
     @Override
     public TooltipsWidget addToFixed(TooltipsWidget widget) {
-        this.fixedTooltips.add(widget);
+        //only 21 has addFirst().
+        ArrayList<TooltipsWidget> tooltipsWidgets = new ArrayList<>(this.fixedTooltips);
+        tooltipsWidgets.add(0, widget);
+        this.fixedTooltips.clear();
+        this.fixedTooltips.addAll(tooltipsWidgets);
         return widget;
     }
 
@@ -77,7 +92,7 @@ public abstract class ScreenMixin implements ScreenDuck {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tc$tickRemoveCurrent(CallbackInfo ci) {
-        if (!Screen.hasAltDown() && currentFocusTooltips != null){
+        if (!Screen.hasAltDown() && currentFocusTooltips != null) {
             this.removeWidget(currentFocusTooltips);
             currentFocusTooltips = null;
         }

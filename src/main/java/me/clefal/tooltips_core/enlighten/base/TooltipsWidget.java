@@ -1,34 +1,30 @@
 package me.clefal.tooltips_core.enlighten.base;
 
+import com.clefal.nirvana_lib.relocated.io.vavr.control.Option;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import lombok.Getter;
 import me.clefal.tooltips_core.TooltipsCore;
-import me.clefal.tooltips_core.enlighten.event.AddToFixedEvent;
+import me.clefal.tooltips_core.enlighten.event.DirectlyAddEnlightenToFixedEvent;
+import me.clefal.tooltips_core.enlighten.handlers.EnlightenTooltipsWidget;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
 import me.clefal.tooltips_core.mixin.ClientTextTooltipAccess;
-import me.clefal.tooltips_core.mixin.GuiGraphicsAccessor;
 import me.clefal.tooltips_core.mixin.GuiGraphicsInvoker;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
-import org.joml.Vector2ic;
 //? 1.20.1 {
 /*import net.minecraftforge.client.ForgeHooksClient;
 *///?} else {
@@ -37,7 +33,6 @@ import net.neoforged.neoforge.client.ClientHooks;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TooltipsWidget extends AbstractWidget {
     private ItemStack itemStack;
@@ -49,6 +44,7 @@ public class TooltipsWidget extends AbstractWidget {
     private final BiMap<Rect2i, ClientTooltipComponent> linesPosition = HashBiMap.create();
     private boolean isPositionInit = false;
     private final static ResourceLocation PIN = TooltipsCore.gui("pin");
+    @Getter
     private boolean isDragging = false;
 
     public TooltipsWidget(int x, int y, int width, int height, List<? extends FormattedText> components, ItemStack itemStack, Screen screen) {
@@ -118,7 +114,17 @@ public class TooltipsWidget extends AbstractWidget {
                 if (styleAt!= null && styleAt.getHoverEvent() != null && EnlightenUtil.isEnlighten(styleAt.getHoverEvent())){
                     Component value = styleAt.getHoverEvent().getValue(HoverEvent.Action.SHOW_TEXT);
                     if (value != null){
-                        TooltipsCore.clientBus.post(new AddToFixedEvent(ItemStack.EMPTY, List.of(value)));
+                        Option<TooltipsWidget> sameTargetWidget = getSameTargetWidget(screen, styleAt.hashCode());
+                        if (sameTargetWidget.isEmpty()) {
+                            TooltipsCore.clientBus.post(new DirectlyAddEnlightenToFixedEvent(ItemStack.EMPTY, List.of(value.copy()), styleAt.hashCode()));
+                        } else {
+                            TooltipsWidget tooltipsWidget = sameTargetWidget.get();
+                            MemorizedTooltipsPositioner positioner1 = tooltipsWidget.positioner;
+                            positioner1.accurateLastPosition = new Vector2d(mouseX, mouseY);
+                            positioner1.lastPosition = new Vector2i(((int) positioner1.accurateLastPosition.x), ((int) positioner1.accurateLastPosition.y));
+
+                            tooltipsWidget.setPosition(positioner1.lastPosition.x, positioner1.lastPosition.y);
+                        }
                     }
                 }
             }
@@ -126,6 +132,7 @@ public class TooltipsWidget extends AbstractWidget {
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
+
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -148,8 +155,11 @@ public class TooltipsWidget extends AbstractWidget {
         ((GuiGraphicsInvoker) guiGraphics).tc$renderTooltipInternal(font, this.components, getX(), getY(), positioner);
         guiGraphics.blit(PIN, getX() + width, getY() - 10, 5, 5, 0, 0, 32, 32, 32, 32);
         Style styleAt = getStyleAt(mouseX, mouseY, font);
-        if (styleAt!= null && styleAt.getHoverEvent() != null){
-            guiGraphics.renderComponentHoverEffect(font, styleAt, mouseX, mouseY);
+        if (styleAt != null && styleAt.getHoverEvent() != null){
+            int i = styleAt.hashCode();
+            if (getSameTargetWidget(screen, styleAt.hashCode()).isEmpty()) {
+                guiGraphics.renderComponentHoverEffect(font, styleAt, mouseX, mouseY);
+            }
         }
     }
 
@@ -179,7 +189,12 @@ public class TooltipsWidget extends AbstractWidget {
         return null;
     }
 
+    private static Option<TooltipsWidget> getSameTargetWidget(Screen screen, int hashcode){
 
+        return Option.ofOptional(((ScreenDuck) screen).getAllFixed().stream()
+                        .filter(x -> (x instanceof EnlightenTooltipsWidget enlightenTooltipsWidget && enlightenTooltipsWidget.isSameTarget(hashcode)))
+                        .findFirst());
+    }
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {

@@ -6,13 +6,15 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public class AddToFixedEvent extends Event {
+public class DirectlyAddEnlightenToFixedEvent extends Event {
 
     public ItemStack itemStack;
     public List<? extends FormattedText> components;
+    public int styleHashcode;
 
-    public AddToFixedEvent(ItemStack itemStack, List<? extends FormattedText> components) {
+    public DirectlyAddEnlightenToFixedEvent(ItemStack itemStack, List<? extends FormattedText> components, int styleHashcode) {
         this.itemStack = itemStack;
         this.components = components;
+        this.styleHashcode = styleHashcode;
     }
 }

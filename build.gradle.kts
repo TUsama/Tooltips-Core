@@ -213,6 +213,8 @@ dependencies {
             modstitchModImplementation("thedarkcolour:kotlinforforge:4.11.0")
             modstitchModRuntimeOnly ("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
             modstitchModCompileOnly ("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api")
+        } else{
+            //modstitchModRuntimeOnly("curse.maven:modern-ui-352491:6956436")
         }
     }
 }

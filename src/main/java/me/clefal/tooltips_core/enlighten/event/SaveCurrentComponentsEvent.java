@@ -21,7 +21,6 @@ public class SaveCurrentComponentsEvent extends Event {
     public static boolean tryPost(List<? extends FormattedText> list, ItemStack itemStack){
         if (Screen.hasAltDown() && !TooltipsRecorder.isTakenOverByTC()) {
             TooltipsCore.clientBus.post(new SaveCurrentComponentsEvent(itemStack, list));
-            System.out.println("post!");
             return true;
         }
         return false;

@@ -5,6 +5,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import lombok.Getter;
 import me.clefal.tooltips_core.TooltipsCore;
+import me.clefal.tooltips_core.config.TooltipsCoreConfig;
 import me.clefal.tooltips_core.enlighten.event.DirectlyAddEnlightenToFixedEvent;
 import me.clefal.tooltips_core.enlighten.handlers.EnlightenTooltipsWidget;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
@@ -44,7 +45,11 @@ public class ComponentTooltipsWidget extends AbstractTooltipsWidget {
     public ComponentTooltipsWidget(int x, int y, int width, int height, List<? extends FormattedText> components, ItemStack itemStack, Screen screen) {
         super(x, y, width, height, Component.empty(), screen);
         this.originals = tryCopy(components);
-        this.revealed = EnlightenUtil.reveal(components);
+        if (TooltipsCoreConfig.tooltipsCoreConfig.enable_reveal_on_default){
+            this.revealed = components;
+        } else {
+            this.revealed = EnlightenUtil.reveal(components);
+        }
         List<ClientTooltipComponent> clientTooltipComponents =
                 //? 1.20.1 {
                 /*ForgeHooksClient.

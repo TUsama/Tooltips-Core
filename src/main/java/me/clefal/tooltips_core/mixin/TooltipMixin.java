@@ -5,9 +5,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = Tooltip.class
 //? >1.20.1
@@ -22,10 +20,12 @@ public class TooltipMixin {
         return ((Component) EnlightenUtil.reveal(value).get(0));
     }
 
-    @Inject(
+    @ModifyVariable(
             method = "create(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)Lnet/minecraft/client/gui/components/Tooltip;",
-            at = @At(value = "HEAD"))
-    private static void reveal2(Component message, Component narration, CallbackInfoReturnable<Tooltip> cir){
-        message = ((Component) EnlightenUtil.reveal(message).get(0));
+            at = @At(value = "HEAD"),
+            ordinal = 0,
+            argsOnly = true)
+    private static Component reveal2(Component message){
+        return ((Component) EnlightenUtil.reveal(message).get(0));
     }
 }

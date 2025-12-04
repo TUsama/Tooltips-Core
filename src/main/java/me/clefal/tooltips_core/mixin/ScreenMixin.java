@@ -118,7 +118,7 @@ public abstract class ScreenMixin implements ScreenDuck {
 
     @WrapOperation(method = "renderWithTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;II)V"))
     private void tc$renderWithTooltip$record1(GuiGraphics instance, Font font, List<FormattedCharSequence> tooltipLines, ClientTooltipPositioner tooltipPositioner, int mouseX, int mouseY, Operation<Void> original) {
-        if (!SaveFormattedCharSequenceEvent.tryPost(tooltipLines, ItemStack.EMPTY)) {
+        if (!SaveFormattedCharSequenceEvent.tryPost(tooltipLines, ItemStack.EMPTY, tooltipPositioner)) {
             original.call(instance, font, tooltipLines, tooltipPositioner, mouseX, mouseY);
         }
     }

@@ -3,6 +3,7 @@ package me.clefal.tooltips_core.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import me.clefal.tooltips_core.config.TooltipsCoreConfig;
 import me.clefal.tooltips_core.enlighten.base.BypassTooltipsPositioner;
 import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
@@ -18,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +41,42 @@ public abstract class GuiGraphicsMixin {
     @Shadow
     protected abstract void renderTooltipInternal(Font font, List<ClientTooltipComponent> components, int mouseX, int mouseY, ClientTooltipPositioner tooltipPositioner);
 
+    @ModifyVariable(
+            method = "renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;II)V",
+            at = @At(value = "HEAD"),
+            argsOnly = true)
+    private List<Component> tc$reveal1(List<Component> tooltipLines){
+        if (TooltipsCoreConfig.tooltipsCoreConfig.enable_reveal_on_default){
+            return ((List<Component>) EnlightenUtil.reveal(tooltipLines));
+        } else {
+            return tooltipLines;
+        }
+    }
+
     @WrapOperation(method = "renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;II)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltipInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;)V")
     )
     private void tc$renderTooltip$record1(GuiGraphics instance, Font font, List<ClientTooltipComponent> clienttooltipcomponent1, int mouseX, int mouseY, ClientTooltipPositioner k2, Operation<Void> original, @Local(ordinal = 0, argsOnly = true) List<Component> tooltipLines) {
         if (!SaveCurrentComponentsEvent.tryPost(tooltipLines, this.tooltipStack)) {
-            original.call(instance, font, tooltipLines, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE);
+            original.call(instance, font, clienttooltipcomponent1, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE);
         }
     }
+
+    @ModifyVariable(
+            method = "renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/world/item/ItemStack;)V",
+            at = @At(value = "HEAD"),
+            argsOnly = true
+            //? 1.20.1
+            /*, remap = false*/
+    )
+    private List<? extends FormattedText> tc$reveal2(List<? extends FormattedText> tooltipLines){
+        if (TooltipsCoreConfig.tooltipsCoreConfig.enable_reveal_on_default){
+            return EnlightenUtil.reveal(tooltipLines);
+        } else {
+            return tooltipLines;
+        }
+    }
+
 
     @WrapOperation(method = "renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/world/item/ItemStack;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltipInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;)V"))
@@ -55,6 +85,19 @@ public abstract class GuiGraphicsMixin {
             original.call(instance, font, clienttooltipcomponent1, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE);
         }
     }
+
+    @ModifyVariable(
+            method = "renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V",
+            at = @At(value = "HEAD"),
+            argsOnly = true)
+    private List<Component> tc$reveal3(List<Component> tooltipLines){
+        if (TooltipsCoreConfig.tooltipsCoreConfig.enable_reveal_on_default){
+            return ((List<Component>) EnlightenUtil.reveal(tooltipLines));
+        } else {
+            return tooltipLines;
+        }
+    }
+
 
     @WrapOperation(method = "renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltipInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;)V"))
     private void tc$renderTooltip$record3(GuiGraphics instance, Font font, List<ClientTooltipComponent> clienttooltipcomponent1, int mouseX, int mouseY, ClientTooltipPositioner positioner, Operation<Void> original, @Local(ordinal = 0, argsOnly = true) List<? extends FormattedText> tooltipLines) {
@@ -78,6 +121,7 @@ public abstract class GuiGraphicsMixin {
         }
     }
 
+    //pair with renderComponentHoverEffect
     @WrapOperation(
             method = "renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;II)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltipInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;)V")

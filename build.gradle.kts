@@ -1,3 +1,5 @@
+import dev.isxander.modstitch.base.moddevgradle.MDGType
+
 plugins {
     id("dev.isxander.modstitch.base") version "0.7.1-unstable"
 }
@@ -17,6 +19,9 @@ fun doLib(consumer: (prop: String) -> Unit){
 
 var loader: String = name.split("-")[1]
 
+base {
+    archivesName = "${property("mod_name") as String}-${loader}-${minecraft}"
+}
 
 modstitch {
     minecraftVersion = minecraft
@@ -219,6 +224,13 @@ dependencies {
             modstitchModCompileOnly ("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api")
         } else{
             //modstitchModRuntimeOnly("curse.maven:modern-ui-352491:6956436")
+
+            modstitchModImplementation("curse.maven:apotheosis-313970:7180713")
+            modstitchModRuntimeOnly("curse.maven:apothic-attributes-898963:6751650")
+            modstitchModRuntimeOnly("curse.maven:apothic-enchanting-1063926:6926290")
+            modstitchModRuntimeOnly("curse.maven:apothic-spawners-986583:6751589")
+            modstitchModRuntimeOnly("curse.maven:patchouli-306770:6842247")
+            modstitchModRuntimeOnly("curse.maven:placebo-283644:6926281")
         }
     }
 }

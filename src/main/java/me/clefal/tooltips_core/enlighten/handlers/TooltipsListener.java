@@ -43,7 +43,7 @@ public class TooltipsListener {
     @SubscribeEvent
     private void grabFormattedCharSequence(SaveFormattedCharSequenceEvent event) {
         if (!TooltipsRecorder.ifTooltipsRecordPending()) {
-            TooltipsRecorder.setPendingTooltips(new TooltipsRecorder.FormattedCharSequenceTooltipsRecord(event.itemStack, event.components));
+            TooltipsRecorder.setPendingTooltips(new TooltipsRecorder.FormattedCharSequenceTooltipsRecord(event.itemStack, event.components, event.positioner));
         }
 
     }

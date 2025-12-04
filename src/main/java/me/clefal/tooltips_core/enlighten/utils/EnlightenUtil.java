@@ -41,7 +41,7 @@ public class EnlightenUtil {
             if (component instanceof MutableComponent comp) {
                 Component newComponent;
                 if (comp.getContents() instanceof TranslatableContents contents && I18n.exists(getEnlighten.apply(contents.getKey()))) {
-                    TooltipsCore.LOGGER.warn("found enlighten for {}, prepare to reveal", contents.getKey());
+                    //TooltipsCore.LOGGER.warn("found enlighten for {}, prepare to reveal", contents.getKey());
                     MutableComponent mutableComponent = resolveEnlightenComponent(comp, Component.translatable(getEnlighten.apply(contents.getKey())));
                     newComponent = mutableComponent;
                 } else {

@@ -10,6 +10,7 @@ import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
 import me.clefal.tooltips_core.mixin.ScreenInvoker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
@@ -109,23 +110,25 @@ public class TooltipsRecorder {
 
     public static class FormattedCharSequenceTooltipsRecord extends AbstractTooltipsRecord<List<FormattedCharSequence>> {
         public List<FormattedCharSequence> components;
+        public ClientTooltipPositioner positioner;
 
-        public FormattedCharSequenceTooltipsRecord(ItemStack itemStack, List<FormattedCharSequence> components) {
+        public FormattedCharSequenceTooltipsRecord(ItemStack itemStack, List<FormattedCharSequence> components, ClientTooltipPositioner positioner) {
             super(itemStack);
             this.components = components;
+            this.positioner = positioner;
         }
 
         @Override
         public List<FormattedCharSequence> provide() {
-            return List.of();
+            return components;
         }
 
         @Override
         public FormattedCharSequenceTooltipsWidget setUpWidget(ScreenEvent.Render.Pre event) {
             Screen screen = event.getScreen();
-            FormattedCharSequenceTooltipsWidget formattedCharSequenceTooltipsWidget = new FormattedCharSequenceTooltipsWidget(event.getMouseX(), event.getMouseY(), 5, 5, event.getScreen(), provide());
+            FormattedCharSequenceTooltipsWidget formattedCharSequenceTooltipsWidget = new FormattedCharSequenceTooltipsWidget(event.getMouseX(), event.getMouseY(), 5, 5, event.getScreen(), provide(), positioner);
 
-            ((ScreenInvoker) screen).callAddRenderableWidget(formattedCharSequenceTooltipsWidget);
+            ((ScreenDuck) screen).addFirstRenderableWidget(formattedCharSequenceTooltipsWidget);
             ((ScreenDuck) screen).tc$setCurrentFocusTooltips(formattedCharSequenceTooltipsWidget);
 
             setPendingTooltips(null);

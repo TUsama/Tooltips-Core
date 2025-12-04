@@ -42,7 +42,7 @@ public abstract class GuiGraphicsMixin {
     @WrapOperation(method = "renderComponentTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;II)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltipInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;)V")
     )
-    private void tc$renderTooltip$record1(GuiGraphics instance, Font font, List<ClientTooltipComponent> clienttooltipcomponent1, int mouseX, int mouseY, ClientTooltipPositioner k2, Operation<Void> original, @Local(ordinal = 0, argsOnly = true) List<? extends FormattedText> tooltipLines) {
+    private void tc$renderTooltip$record1(GuiGraphics instance, Font font, List<ClientTooltipComponent> clienttooltipcomponent1, int mouseX, int mouseY, ClientTooltipPositioner k2, Operation<Void> original, @Local(ordinal = 0, argsOnly = true) List<Component> tooltipLines) {
         if (!SaveCurrentComponentsEvent.tryPost(tooltipLines, this.tooltipStack)) {
             original.call(instance, font, tooltipLines, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE);
         }

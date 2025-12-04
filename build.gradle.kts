@@ -179,6 +179,8 @@ dependencies {
     add("testCompileOnly", "org.projectlombok:lombok:1.18.${version}")
     add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.${version}")
 
+    annotationProcessor("org.spongepowered:mixin:0.8.7:processor")
+
     if (modstitch.isModDevGradleLegacy) {
         modstitchModImplementation("me.fzzyhmstrs:fzzy_config:${fzzyConfigVersion}+${fzzyMinecraftVersion}+forge")
     } else {
@@ -200,6 +202,8 @@ dependencies {
         if (modstitch.isModDevGradleLegacy){
             compileOnly("io.github.llamalad7:mixinextras-common:0.5.0")
             implementation("io.github.llamalad7:mixinextras-forge:0.5.0").jij()
+            annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0")
+
 
 /*
             modstitchModImplementation("curse.maven:mine-and-slash-reloaded-306575:7103653")

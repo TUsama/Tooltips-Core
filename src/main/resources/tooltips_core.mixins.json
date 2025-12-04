@@ -16,7 +16,8 @@
     "GuiGraphicsInvoker",
     "GuiGraphicsMixin",
     "ScreenInvoker",
-    "ScreenMixin"
+    "ScreenMixin",
+    "TooltipMixin"
   ],
   "mixins": [
     "FontMixin",

@@ -12,7 +12,10 @@ import org.spongepowered.asm.mixin.Unique;
 import java.util.List;
 import java.util.Optional;
 
-@Mixin(value = MutableComponent.class)
+@Mixin(value = MutableComponent.class
+//? >1.20.1
+        ,remap = false
+)
 public abstract class MutableComponentMixin implements Component, MutableComponentDuck {
 
     @Unique

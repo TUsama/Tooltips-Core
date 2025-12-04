@@ -10,7 +10,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 
-@Mod("examplemod")
+@Mod(TooltipsCore.MOD_ID)
 public class ForgeEntrypoint {
     private static final Logger LOGGER = LogUtils.getLogger();
 

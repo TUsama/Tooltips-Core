@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 public class EnlightenUtil {
     private static final Function<String, String> getEnlighten = string -> string + ".enlighten";
     private static final Function<String, String> termFinder = s -> "enlighten.term." + s;
-    private Pattern group = Pattern.compile("\\[(.+)\\]\\((.+)\\)");
+    private static Pattern group = Pattern.compile("\\[(.+)\\]\\((.+)\\)");
 
     public static List<? extends FormattedText> reveal(Component component) {
         return reveal(List.of(component));

@@ -11,11 +11,14 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(value = GuiGraphics.class,remap = false)
+@Mixin(value = GuiGraphics.class
+//? >1.20.1
+        ,remap = false
+)
 public interface GuiGraphicsAccessor {
-    @Accessor
+    @Accessor(remap = false)
     ItemStack getTooltipStack();
 
-    @Accessor
+    @Accessor(remap = false)
     void setTooltipStack(ItemStack stack);
 }

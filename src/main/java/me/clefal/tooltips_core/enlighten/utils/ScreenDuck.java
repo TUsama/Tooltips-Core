@@ -1,6 +1,7 @@
 package me.clefal.tooltips_core.enlighten.utils;
 
-import me.clefal.tooltips_core.enlighten.base.TooltipsWidget;
+import me.clefal.tooltips_core.enlighten.base.AbstractTooltipsWidget;
+import me.clefal.tooltips_core.enlighten.base.ComponentTooltipsWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -11,19 +12,19 @@ import java.util.Set;
 public interface ScreenDuck {
 
     @Nullable
-    TooltipsWidget tc$getCurrentFocusTooltips();
+    AbstractTooltipsWidget tc$getCurrentFocusTooltips();
 
-    void tc$setCurrentFocusTooltips(TooltipsWidget currentFocusTooltips);
+    void tc$setCurrentFocusTooltips(AbstractTooltipsWidget currentFocusTooltips);
 
     boolean tc$isTakenOver();
 
-    TooltipsWidget addToFixed(TooltipsWidget widget);
+    AbstractTooltipsWidget addToFixed(AbstractTooltipsWidget widget);
 
-    void removeFromFixed(TooltipsWidget widget);
+    void removeFromFixed(AbstractTooltipsWidget widget);
 
-    void addToRemoved(TooltipsWidget widget);
+    void addToRemoved(AbstractTooltipsWidget widget);
 
-    Set<TooltipsWidget> getAllFixed();
+    Set<AbstractTooltipsWidget> getAllFixed();
 
     <T extends GuiEventListener & Renderable & NarratableEntry> T addFirstRenderableWidget(T widget);
 }

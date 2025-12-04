@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.gen.Invoker;
         ,remap = false
 )
 public interface ScreenInvoker {
-    @Invoker(value = "addRenderableWidget", remap = false) <T extends GuiEventListener & Renderable & NarratableEntry> T tc$addRenderableWidget(T widget);
+    @Invoker <T extends GuiEventListener & Renderable & NarratableEntry> T callAddRenderableWidget(T widget);
 
-    @Invoker("removeWidget") void tc$removeWidget(GuiEventListener listener);
 }

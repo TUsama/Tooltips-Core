@@ -5,7 +5,10 @@ import net.minecraft.util.FormattedCharSequence;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ClientTextTooltip.class)
+@Mixin(value = ClientTextTooltip.class
+        //? >1.20.1
+        ,remap = false
+)
 public interface ClientTextTooltipAccess {
     @Accessor
     FormattedCharSequence getText();

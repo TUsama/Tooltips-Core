@@ -13,7 +13,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = AbstractContainerScreen.class)
+@Mixin(value = AbstractContainerScreen.class
+        //? >1.20.1
+        ,remap = false
+)
 public class AbstractContainerScreenMixin {
 
     @WrapOperation(

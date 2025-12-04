@@ -1,12 +1,27 @@
 package me.clefal.tooltips_core.mixin;
 
-import me.clefal.tooltips_core.enlighten.base.TooltipsWidget;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import me.clefal.tooltips_core.enlighten.base.AbstractTooltipsWidget;
+import me.clefal.tooltips_core.enlighten.base.ComponentTooltipsWidget;
+import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
+import me.clefal.tooltips_core.enlighten.event.SaveFormattedCharSequenceEvent;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,13 +33,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import javax.annotation.Nullable;
 import java.util.*;
 
-@Mixin(value = Screen.class)
+@Mixin(value = Screen.class
+//? >1.20.1
+        ,remap = false
+)
 public abstract class ScreenMixin implements ScreenDuck {
     @Unique
     @Nullable
-    public TooltipsWidget currentFocusTooltips;
+    public AbstractTooltipsWidget currentFocusTooltips;
     @Unique
-    public LinkedHashSet<TooltipsWidget> fixedTooltips = new LinkedHashSet<>();
+    public LinkedHashSet<AbstractTooltipsWidget> fixedTooltips = new LinkedHashSet<>();
     @Shadow
     @Final
     public List<Renderable> renderables;
@@ -47,12 +65,12 @@ public abstract class ScreenMixin implements ScreenDuck {
     protected abstract void removeWidget(GuiEventListener listener);
 
     @Unique
-    public TooltipsWidget tc$getCurrentFocusTooltips() {
+    public AbstractTooltipsWidget tc$getCurrentFocusTooltips() {
         return currentFocusTooltips;
     }
 
     @Unique
-    public void tc$setCurrentFocusTooltips(TooltipsWidget currentFocusTooltips) {
+    public void tc$setCurrentFocusTooltips(AbstractTooltipsWidget currentFocusTooltips) {
         this.currentFocusTooltips = currentFocusTooltips;
     }
 
@@ -62,9 +80,9 @@ public abstract class ScreenMixin implements ScreenDuck {
     }
 
     @Override
-    public TooltipsWidget addToFixed(TooltipsWidget widget) {
+    public AbstractTooltipsWidget addToFixed(AbstractTooltipsWidget widget) {
         //only 21 has addFirst().
-        ArrayList<TooltipsWidget> tooltipsWidgets = new ArrayList<>(this.fixedTooltips);
+        ArrayList<AbstractTooltipsWidget> tooltipsWidgets = new ArrayList<>(this.fixedTooltips);
         tooltipsWidgets.add(0, widget);
         this.fixedTooltips.clear();
         this.fixedTooltips.addAll(tooltipsWidgets);
@@ -72,12 +90,12 @@ public abstract class ScreenMixin implements ScreenDuck {
     }
 
     @Override
-    public Set<TooltipsWidget> getAllFixed() {
+    public Set<AbstractTooltipsWidget> getAllFixed() {
         return this.fixedTooltips;
     }
 
     @Override
-    public void removeFromFixed(TooltipsWidget widget) {
+    public void removeFromFixed(AbstractTooltipsWidget widget) {
         this.fixedTooltips.remove(widget);
         Minecraft.getInstance().tell(() -> {
             this.removeWidget(widget);
@@ -86,7 +104,7 @@ public abstract class ScreenMixin implements ScreenDuck {
     }
 
     @Override
-    public void addToRemoved(TooltipsWidget widget) {
+    public void addToRemoved(AbstractTooltipsWidget widget) {
 
     }
 
@@ -97,24 +115,14 @@ public abstract class ScreenMixin implements ScreenDuck {
             currentFocusTooltips = null;
         }
     }
-/*
-    @Inject(method = "setTooltipForNextRenderPass(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"))
-    private void tc$handleComponent(Component tooltip, CallbackInfo ci) {
-        MixinMethod.handleComponent(tooltip);
-    }
 
-    @Inject(method = "setTooltipForNextRenderPass(Lnet/minecraft/client/gui/components/Tooltip;Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Z)V", at = @At("HEAD"))
-    private void tc$handleTooltip(Tooltip tooltip, ClientTooltipPositioner positioner, boolean override, CallbackInfo ci) {
-        MixinMethod.handleTooltips((TooltipsDuck) tooltip);
-    }
-
-    @Redirect(method = "renderWithTooltip",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;II)V"))
-    private void tc$renderTooltipWrap(GuiGraphics instance, Font font, List<FormattedCharSequence> tooltipLines, ClientTooltipPositioner tooltipPositioner, int mouseX, int mouseY) {
-        if (MixinMethod.wrapRenderWithTooltips(((Screen) ((Object) this)), currentFocusTooltips, mouseX, mouseY)) {
-            instance.renderTooltip(font, tooltipLines, tooltipPositioner, mouseX, mouseY);
+    @WrapOperation(method = "renderWithTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;II)V"))
+    private void tc$renderWithTooltip$record1(GuiGraphics instance, Font font, List<FormattedCharSequence> tooltipLines, ClientTooltipPositioner tooltipPositioner, int mouseX, int mouseY, Operation<Void> original) {
+        if (!SaveFormattedCharSequenceEvent.tryPost(tooltipLines, ItemStack.EMPTY)) {
+            original.call(instance, font, tooltipLines, tooltipPositioner, mouseX, mouseY);
         }
     }
-*/
+
+
 
 }

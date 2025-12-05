@@ -75,6 +75,11 @@ public class EnlightenUtil {
 
     private static MutableComponent handleWholeComponent(MutableComponent target, Map<String, Component> enlightenMap) {
         Set<String> strings = enlightenMap.keySet();
+        if (strings.contains("*")){
+            MutableComponent copy = target.copy();
+            copy.withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(enlightenMap.get("*").get()))).withUnderlined(true));
+            return copy;
+        }
         Optional<Map<String, Component>> tuple2s = ((MutableComponentDuck) target).tooltips_Core$grabEligibles((style, content) -> {
             List<String> javaList = strings.filter(content::contains)
                     .toJavaList();

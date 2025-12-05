@@ -177,6 +177,16 @@ val fzzyMinecraftVersion = when (minecraft) {
 
 dependencies {
     fun Dependency?.jij() = this?.also(::modstitchJiJ)
+    fun String.implementation() = if (modstitch.isModDevGradleLegacy){
+        add("modImplementation", this)
+    } else {
+        modstitchModImplementation(this)
+    }
+    fun String.runtimeOnly() = if (modstitch.isModDevGradleLegacy) {
+        add("modRuntimeOnly", this)
+    } else {
+        modstitchModRuntimeOnly(this)
+    }
 
     val version = 42
     add("compileOnly", "org.projectlombok:lombok:1.18.${version}")
@@ -185,16 +195,17 @@ dependencies {
     add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.${version}")
 
     annotationProcessor("org.spongepowered:mixin:0.8.7:processor")
+    val fzzy = "me.fzzyhmstrs:fzzy_config:${fzzyConfigVersion}+${fzzyMinecraftVersion}+"
 
     if (modstitch.isModDevGradleLegacy) {
-        modstitchModImplementation("me.fzzyhmstrs:fzzy_config:${fzzyConfigVersion}+${fzzyMinecraftVersion}+forge")
+        (fzzy+"forge").implementation()
     } else {
-        modstitchModImplementation(("me.fzzyhmstrs:fzzy_config:${fzzyConfigVersion}+${fzzyMinecraftVersion}+neoforge"))
+        modstitchModImplementation(fzzy + "neoforge")
     }
 
-    doLib{
-        modstitchModImplementation("maven.modrinth:nirvana-library:${loader}-${minecraft}-${libVersion}")
-        modstitchModRuntimeOnly("maven.modrinth:common-network:${property("deps.common_network")}")
+    doLib {
+        "maven.modrinth:nirvana-library:${loader}-${minecraft}-${libVersion}".implementation()
+        "maven.modrinth:common-network:${property("deps.common_network")}".runtimeOnly()
     }
 
 
@@ -209,19 +220,17 @@ dependencies {
             implementation("io.github.llamalad7:mixinextras-forge:0.5.0").jij()
             annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0")
 
+            "curse.maven:mine-and-slash-reloaded-306575:7103653".implementation()
+            "curse.maven:dungeon-realm-1200770:7103646".runtimeOnly()
+            "curse.maven:library-of-exile-398780:7103648".implementation()
+            "curse.maven:playeranimator-658587:4587214".runtimeOnly()
+            "curse.maven:the-harvest-1201731:7103642".runtimeOnly()
+            "curse.maven:ancient-obelisks-1186288:7103644".runtimeOnly()
 
-/*
-            modstitchModImplementation("curse.maven:mine-and-slash-reloaded-306575:7103653")
-            modstitchModRuntimeOnly("curse.maven:dungeon-realm-1200770:7103646")
-            modstitchModImplementation("curse.maven:library-of-exile-398780:7103648")
-            modstitchModRuntimeOnly("curse.maven:playeranimator-658587:4587214")
-            modstitchModRuntimeOnly("curse.maven:the-harvest-1201731:7103642")
-            modstitchModRuntimeOnly("curse.maven:ancient-obelisks-1186288:7103644")
-*/
 
-            modstitchModImplementation("thedarkcolour:kotlinforforge:4.11.0")
-            modstitchModRuntimeOnly ("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
+            "thedarkcolour:kotlinforforge:4.11.0".implementation()
             modstitchModCompileOnly ("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api")
+            add("modRuntimeOnly", "top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
         } else{
             //modstitchModRuntimeOnly("curse.maven:modern-ui-352491:6956436")
 

@@ -5,7 +5,6 @@ import me.clefal.tooltips_core.TooltipsCore;
 import me.fzzyhmstrs.fzzy_config.api.ConfigApiJava;
 import me.fzzyhmstrs.fzzy_config.api.RegisterType;
 import me.fzzyhmstrs.fzzy_config.config.Config;
-import me.fzzyhmstrs.fzzy_config.validation.number.ValidatedInt;
 
 public class TooltipsCoreConfig extends Config {
     public static TooltipsCoreConfig tooltipsCoreConfig = ConfigApiJava.registerAndLoadConfig(TooltipsCoreConfig::new, RegisterType.CLIENT);

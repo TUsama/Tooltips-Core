@@ -93,11 +93,17 @@ public class VanillaTooltipsHandler {
         Screen screen = event.getScreen();
         List<AbstractTooltipsWidget> all = ((ScreenDuck) screen).getAll();
         GuiGraphics guiGraphics = event.getGuiGraphics();
-        guiGraphics.pose().pushPose();
+
         for (AbstractTooltipsWidget tooltipsWidget : all) {
+            guiGraphics.pose().pushPose();
+            if (tooltipsWidget.isFocused()) {
+                guiGraphics.pose().translate(0, 0, 200);
+                ((ScreenDuck) screen).raiseToFirstWidget(tooltipsWidget);
+            }
             tooltipsWidget.render(event.getGuiGraphics(), event.getMouseX(), event.getMouseY(), event.getPartialTick());
+            guiGraphics.pose().popPose();
         }
-        guiGraphics.pose().popPose();
+
 
     }
 

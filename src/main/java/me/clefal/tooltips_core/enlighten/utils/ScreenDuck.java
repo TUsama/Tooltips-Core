@@ -32,4 +32,6 @@ public interface ScreenDuck {
     <T extends GuiEventListener & Renderable & NarratableEntry> T addFirstRenderableWidget(T widget);
 
     <T extends GuiEventListener & NarratableEntry> T addWidgetToFirst(T listener);
+
+    <T extends GuiEventListener & NarratableEntry> T raiseToFirstWidget(T listener);
 }

@@ -39,6 +39,8 @@ import java.util.*;
         ,remap = false
 )
 public abstract class ScreenMixin implements ScreenDuck {
+
+
     @Unique
     @Nullable
     private AbstractTooltipsWidget currentFocusTooltips;
@@ -122,9 +124,12 @@ public abstract class ScreenMixin implements ScreenDuck {
 
     }
 
-    @Override
-    public void addToRemoved(AbstractTooltipsWidget widget) {
 
+    @Override
+    public <T extends GuiEventListener & NarratableEntry> T raiseToFirstWidget(T listener) {
+        this.removeWidget(listener);
+        this.addWidgetToFirst(listener);
+        return listener;
     }
 
     @Inject(method = "tick", at = @At("TAIL"))

@@ -71,8 +71,8 @@ public class TooltipsRecorder {
         @Override
         public ComponentTooltipsWidget setUpWidget(ScreenEvent.Render.Pre event) {
             Screen screen = event.getScreen();
-            ComponentTooltipsWidget componentTooltipsWidget = new ComponentTooltipsWidget(event.getMouseX(), event.getMouseY(), 5, 5, provide(), itemStack, screen);
-            ((ScreenInvoker) screen).callAddRenderableWidget(componentTooltipsWidget);
+            ComponentTooltipsWidget componentTooltipsWidget = new ComponentTooltipsWidget(event.getMouseX(), event.getMouseY(), 100, 100, provide(), itemStack, screen);
+            ((ScreenDuck) screen).addWidgetToFirst(componentTooltipsWidget);
             ((ScreenDuck) screen).tc$setCurrentFocusTooltips(componentTooltipsWidget);
 
             return componentTooltipsWidget;
@@ -98,11 +98,11 @@ public class TooltipsRecorder {
 
             } else {
 
-                fixed = new ComponentTooltipsWidget(event.getMouseX(), event.getMouseY(), 5, 5, provide(), itemStack, screen);
+                fixed = new ComponentTooltipsWidget(event.getMouseX(), event.getMouseY(), 100, 100, provide(), itemStack, screen);
 
             }
 
-            ((ScreenDuck) screen).addFirstRenderableWidget(fixed);
+            ((ScreenDuck) screen).addWidgetToFirst(fixed);
             ((ScreenDuck) screen).addToFixed(fixed);
             return fixed;
         }
@@ -128,7 +128,7 @@ public class TooltipsRecorder {
             Screen screen = event.getScreen();
             FormattedCharSequenceTooltipsWidget formattedCharSequenceTooltipsWidget = new FormattedCharSequenceTooltipsWidget(event.getMouseX(), event.getMouseY(), 5, 5, event.getScreen(), provide(), positioner);
 
-            ((ScreenDuck) screen).addFirstRenderableWidget(formattedCharSequenceTooltipsWidget);
+            ((ScreenDuck) screen).addWidgetToFirst(formattedCharSequenceTooltipsWidget);
             ((ScreenDuck) screen).tc$setCurrentFocusTooltips(formattedCharSequenceTooltipsWidget);
 
             setPendingTooltips(null);

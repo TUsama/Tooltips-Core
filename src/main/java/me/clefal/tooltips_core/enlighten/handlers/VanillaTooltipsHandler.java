@@ -1,12 +1,12 @@
 package me.clefal.tooltips_core.enlighten.handlers;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import me.clefal.tooltips_core.enlighten.base.AbstractTooltipsWidget;
 import me.clefal.tooltips_core.enlighten.base.BypassTooltipsPositioner;
-import me.clefal.tooltips_core.enlighten.base.ComponentTooltipsWidget;
 import me.clefal.tooltips_core.enlighten.base.MemorizedTooltipsPositioner;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
-import me.clefal.tooltips_core.mixin.ScreenInvoker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 //? 1.20.1 {
@@ -23,7 +23,7 @@ import net.neoforged.neoforge.client.event.ScreenEvent;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
 public class VanillaTooltipsHandler {
 
@@ -85,4 +85,20 @@ public class VanillaTooltipsHandler {
 
 
     }
+
+    @SubscribeEvent
+    public void postRenderTooltipsWidget(ScreenEvent.Render.Post event) {
+        //since I render the widget on Post, The widget hover event will be a little bit earlier triggered, resulting a visual bug that when the first line is enlightened, the enlightened content will be rendered prob for 1 frame.
+        //IDK if this is really the cause tho.
+        Screen screen = event.getScreen();
+        List<AbstractTooltipsWidget> all = ((ScreenDuck) screen).getAll();
+        GuiGraphics guiGraphics = event.getGuiGraphics();
+        guiGraphics.pose().pushPose();
+        for (AbstractTooltipsWidget tooltipsWidget : all) {
+            tooltipsWidget.render(event.getGuiGraphics(), event.getMouseX(), event.getMouseY(), event.getPartialTick());
+        }
+        guiGraphics.pose().popPose();
+
+    }
+
 }

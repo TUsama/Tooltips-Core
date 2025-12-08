@@ -1,6 +1,7 @@
 package me.clefal.tooltips_core;
-
-import net.minecraftforge.fml.loading.LoadingModList;
+        //? 1.20.1 {
+/*import net.minecraftforge.fml.loading.LoadingModList;
+        *///?}
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -21,10 +22,13 @@ public class TCMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (LoadingModList.get().getModFileById("mmorpg") == null && mixinClassName.contains("mas")) {
+        //? 1.20.1 {
+        /*if (LoadingModList.get().getModFileById("mmorpg") == null && mixinClassName.contains("mas")) {
             TooltipsCore.LOGGER.info("Disable Mixin: " + mixinClassName);
             return false;
         }
+        *///?}
+
 
         return true;
     }

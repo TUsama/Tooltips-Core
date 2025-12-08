@@ -1,5 +1,6 @@
 package me.clefal.tooltips_core.mixin;
 
+import com.google.common.collect.ImmutableList;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -40,9 +41,9 @@ import java.util.*;
 public abstract class ScreenMixin implements ScreenDuck {
     @Unique
     @Nullable
-    public AbstractTooltipsWidget currentFocusTooltips;
+    private AbstractTooltipsWidget currentFocusTooltips;
     @Unique
-    public LinkedHashSet<AbstractTooltipsWidget> fixedTooltips = new LinkedHashSet<>();
+    private LinkedHashSet<AbstractTooltipsWidget> fixedTooltips = new LinkedHashSet<>();
     @Shadow
     @Final
     public List<Renderable> renderables;
@@ -59,6 +60,13 @@ public abstract class ScreenMixin implements ScreenDuck {
         this.children.add(0, widget);
         this.narratables.add(0, widget);
         return widget;
+    }
+
+    @Override
+    public <T extends GuiEventListener & NarratableEntry> T addWidgetToFirst(T listener) {
+        this.children.add(0, listener);
+        this.narratables.add(0, listener);
+        return listener;
     }
 
     @Shadow
@@ -92,6 +100,17 @@ public abstract class ScreenMixin implements ScreenDuck {
     @Override
     public Set<AbstractTooltipsWidget> getAllFixed() {
         return this.fixedTooltips;
+    }
+
+    @Override
+    public List<AbstractTooltipsWidget> getAll() {
+        ImmutableList.Builder<AbstractTooltipsWidget> builder = ImmutableList.builder();
+        if (this.currentFocusTooltips != null) builder.add(currentFocusTooltips);
+        ArrayList<AbstractTooltipsWidget> tooltipsWidgets = new ArrayList<>(getAllFixed());
+        for (int i = tooltipsWidgets.size() - 1; i >= 0; i--) {
+            builder.add(tooltipsWidgets.get(i));
+        }
+        return builder.build();
     }
 
     @Override

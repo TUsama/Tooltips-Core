@@ -150,6 +150,8 @@ modstitch {
 
         configs.register("tooltips_core")
 
+        if (modstitch.isModDevGradleLegacy) configs.register("tooltips_core_1.20.1")
+
     }
 }
 

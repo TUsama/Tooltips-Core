@@ -130,6 +130,8 @@ public abstract class GuiGraphicsMixin {
         if (!tooltipLines.isEmpty() && tooltipLines.get(tooltipLines.size() - 1).equals(FormattedCharSequence.EMPTY)){
             ArrayList<? extends FormattedCharSequence> formattedCharSequences = new ArrayList<>(tooltipLines);
             formattedCharSequences.remove(formattedCharSequences.size() - 1);
+            instance.pose().pushPose();
+            instance.pose().translate(0, 0, 400);
             this.renderTooltipInternal(
                     font,
                     formattedCharSequences.stream().map(ClientTooltipComponent::create).collect(Collectors.toList()),
@@ -137,6 +139,7 @@ public abstract class GuiGraphicsMixin {
                     mouseY,
                     new BypassTooltipsPositioner()
             );
+            instance.pose().popPose();
         } else {
             original.call(instance, font, clienttooltipcomponent, mouseX, mouseY, positioner);
         }

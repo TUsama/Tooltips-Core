@@ -27,15 +27,16 @@ public class TooltipsListener {
         if (!TooltipsRecorder.ifTooltipsRecordPending()) {
             List<FormattedText> list = event.components.stream().map(x -> {
                         if (x instanceof Component component) {
+
                             Tuple2<Boolean, Component> tuple2 = EnlightenUtil.trimEnlighten(component);
                             if (tuple2._1) {
+                                //System.out.println(tuple2._2);
                                 return tuple2._2;
                             }
                         }
                         return x;
                     })
                     .toList();
-            //will be revealed when it becomes a widget.
             TooltipsRecorder.setPendingTooltips(new TooltipsRecorder.EnlightenTooltipsRecord(list, event.itemStack, event.styleHashcode));
         }
     }

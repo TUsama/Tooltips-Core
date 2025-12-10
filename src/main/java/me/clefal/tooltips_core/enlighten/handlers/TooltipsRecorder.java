@@ -2,12 +2,8 @@ package me.clefal.tooltips_core.enlighten.handlers;
 
 
 import lombok.Getter;
-import me.clefal.tooltips_core.enlighten.base.AbstractTooltipsWidget;
-import me.clefal.tooltips_core.enlighten.base.ComponentTooltipsWidget;
-import me.clefal.tooltips_core.enlighten.base.FormattedCharSequenceTooltipsWidget;
-import me.clefal.tooltips_core.enlighten.base.IComponentProvider;
+import me.clefal.tooltips_core.enlighten.base.*;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
-import me.clefal.tooltips_core.mixin.ScreenInvoker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;

@@ -6,8 +6,8 @@ import org.joml.*;
 
 public class MemorizedTooltipsPositioner implements ClientTooltipPositioner {
     private final ClientTooltipPositioner positioner;
-    protected Vector2d accurateLastPosition;
-    protected Vector2i lastPosition = null;
+    public Vector2d accurateLastPosition;
+    public Vector2i lastPosition = null;
     protected Vector4i lastRectangle = null;
 
     public MemorizedTooltipsPositioner(ClientTooltipPositioner positioner) {

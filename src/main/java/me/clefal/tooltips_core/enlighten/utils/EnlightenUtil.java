@@ -2,6 +2,7 @@ package me.clefal.tooltips_core.enlighten.utils;
 
 import com.clefal.nirvana_lib.relocated.io.vavr.Tuple;
 import com.clefal.nirvana_lib.relocated.io.vavr.Tuple2;
+import com.clefal.nirvana_lib.relocated.io.vavr.collection.LinkedHashMap;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Map;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Set;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Stream;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -118,20 +120,6 @@ public class EnlightenUtil {
         }
     }
 
-    /*
-        private static Map<String, Component> checkSingleSegment(Map<String, Component> enlightenMap, String targetString) {
-            Map<String, Component> filter = enlightenMap.filter(x -> targetString.contains(x._1));
-            List<String> strings = splitBySubstrings(targetString, filter.keySet().toJavaList());
-            boolean flag = false;
-            for (String s : strings) {
-                if (strings.contains(s)) {
-                    flag = true;
-                    break;
-                }
-            }
-            return flag;
-        }
-    */
     private static Map<String, Component> resolveEnlighten(Component component) {
         String string = component.getString();
         String[] split = string.split(",");
@@ -156,7 +144,7 @@ public class EnlightenUtil {
                 .transform(x -> x.toMap(Function.identity()));
     }
 
-    public static List<String> splitBySubstrings(String input, List<String> patterns) {
+    public static List<String> splitBySubstrings(String input, Iterable<String> patterns) {
         List<String> result = new ArrayList<>();
 
         int index = 0;
@@ -194,6 +182,112 @@ public class EnlightenUtil {
         return result;
     }
 
+    public static Component revealNestedEnlighten(Component enlighten){
+        String string = enlighten.getString();
+        Matcher matcher = group.matcher(string);
+
+        Stream<MatchResult> matchResults = Stream.ofAll(matcher.results());
+        if (matchResults.isEmpty()) return enlighten.copy();
+
+        LinkedHashMap<String, MutableComponent> tuple2s = LinkedHashMap.ofEntries(matchResults.map(x -> Tuple.of(
+                        x.group(1),
+                        Component.translatable(termFinder.apply(x.group(2)))
+                ))
+                .filter(tuple2 -> {
+                    boolean exists = ComponentUtils.isTranslationResolvable(tuple2._2());
+                    if (!exists) {
+                        TooltipsCore.LOGGER.warn("found non-exist term: {}", tuple2._2().getString());
+                    }
+                    return exists;
+                }));
+
+        Matcher secondMatch = group.matcher(string);
+
+
+        StringBuilder sb = new StringBuilder();
+        while (secondMatch.find()) {
+            secondMatch.appendReplacement(sb, secondMatch.group(1));
+        }
+        secondMatch.appendTail(sb);
+        string = sb.toString();
+
+        Set<String> strings = tuple2s.keySet();
+
+        List<String> strings1 = splitBySubstrings(string, strings);
+        if (!strings1.isEmpty()) {
+
+            MutableComponent beginning = Component.literal("");
+            for (int i = 0; i < strings1.size(); i++) {
+                String s1 = strings1.get(i);
+
+                if (strings.contains(s1)) {
+                    beginning.append(Component.literal(s1).withStyle(enlighten.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s.get(s1).get()))).withUnderlined(true)));
+                } else {
+                    beginning.append(Component.literal(s1).withStyle(enlighten.getStyle()));
+                }
+
+            }
+            return beginning;
+        } else {
+            TooltipsCore.LOGGER.warn("Fail at splitting target: {}, the result string list is empty.", enlighten.getString());
+            return enlighten;
+        }
+
+    }
+
+    public static Component revealNestedEnlightenOnClick(Component enlighten){
+        String string = enlighten.getString();
+        Matcher matcher = group.matcher(string);
+
+        Stream<MatchResult> matchResults = Stream.ofAll(matcher.results());
+        if (matchResults.isEmpty()) return enlighten.copy();
+
+        LinkedHashMap<String, MutableComponent> tuple2s = LinkedHashMap.ofEntries(matchResults.map(x -> Tuple.of(
+                        x.group(1),
+                        Component.translatable(termFinder.apply(x.group(2)))
+                ))
+                .filter(tuple2 -> {
+                    boolean exists = ComponentUtils.isTranslationResolvable(tuple2._2());
+                    if (!exists) {
+                        TooltipsCore.LOGGER.warn("found non-exist term: {}", tuple2._2().getString());
+                    }
+                    return exists;
+                }));
+
+        Matcher secondMatch = group.matcher(string);
+
+
+        StringBuilder sb = new StringBuilder();
+        while (secondMatch.find()) {
+            secondMatch.appendReplacement(sb, secondMatch.group(1));
+        }
+        secondMatch.appendTail(sb);
+        string = sb.toString();
+
+        Set<String> strings = tuple2s.keySet();
+
+        List<String> strings1 = splitBySubstrings(string, strings);
+        if (!strings1.isEmpty()) {
+
+            MutableComponent beginning = Component.literal("");
+            for (int i = 0; i < strings1.size(); i++) {
+                String s1 = strings1.get(i);
+
+                if (strings.contains(s1)) {
+                    beginning.append(Component.literal(s1).withStyle(enlighten.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.empty().append(tuple2s.get(s1).get()))).withUnderlined(true)));
+                } else {
+                    beginning.append(Component.literal(s1).withStyle(enlighten.getStyle()));
+                }
+
+            }
+            return beginning;
+        } else {
+            TooltipsCore.LOGGER.warn("Fail at splitting target: {}, the result string list is empty.", enlighten.getString());
+            return enlighten;
+        }
+
+    }
+
     public static boolean isEnlighten(HoverEvent event) {
         return event.getAction().equals(HoverEvent.Action.SHOW_TEXT) && event.getValue(HoverEvent.Action.SHOW_TEXT).getString().contains("enlighten: ");
     }
@@ -214,5 +308,10 @@ public class EnlightenUtil {
             return Tuple.of(true, copy);
         }
         return Tuple.of(false, text);
+    }
+
+    public static boolean isNested(Component component){
+        String string = component.getString();
+        return group.matcher(string).find();
     }
 }

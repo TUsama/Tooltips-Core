@@ -4,12 +4,18 @@ import com.clefal.nirvana_lib.relocated.io.vavr.Tuple;
 import com.clefal.nirvana_lib.relocated.io.vavr.Tuple2;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.LinkedHashMap;
 import com.clefal.nirvana_lib.relocated.io.vavr.collection.Map;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import lombok.experimental.UtilityClass;
 import me.clefal.tooltips_core.enlighten.component.DashedLineEffect;
+import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
 import me.clefal.tooltips_core.mixin.BakedGlyphAccessor;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 import net.minecraft.network.chat.*;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 
@@ -84,5 +90,19 @@ public class MixinMethod {
         }
 
         return false;
+    }
+
+    public static void revealOnHover(GuiGraphics instance, Font font, int mouseX, int mouseY, Operation<Void> original, Component component, ItemStack stack, int width) {
+        var tuple2 = EnlightenUtil.trimEnlighten(component);
+
+        Component component1 = ((Component) EnlightenUtil.reveal(tuple2._2).get(0));
+
+        if (EnlightenUtil.isNested(component1)) component1 = EnlightenUtil.revealNestedEnlighten(component1.copy());
+
+        if (!SaveCurrentComponentsEvent.tryPost(List.of(component1), stack)) {
+            List<FormattedCharSequence> split = new ArrayList<>(font.split(component1, Math.max(width / 2, 200)));
+            split.add(FormattedCharSequence.EMPTY);
+            original.call(instance, font, split, mouseX, mouseY);
+        }
     }
 }

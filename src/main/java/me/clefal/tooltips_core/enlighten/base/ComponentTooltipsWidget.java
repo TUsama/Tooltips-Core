@@ -1,30 +1,15 @@
 package me.clefal.tooltips_core.enlighten.base;
 
-import com.clefal.nirvana_lib.relocated.io.vavr.control.Option;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import lombok.Getter;
-import me.clefal.tooltips_core.TooltipsCore;
 import me.clefal.tooltips_core.config.TooltipsCoreConfig;
-import me.clefal.tooltips_core.enlighten.event.DirectlyAddEnlightenToFixedEvent;
-import me.clefal.tooltips_core.enlighten.handlers.EnlightenTooltipsWidget;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
-import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
-import me.clefal.tooltips_core.mixin.ClientTextTooltipAccess;
 import me.clefal.tooltips_core.mixin.GuiGraphicsInvoker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.*;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Vector2d;
-import org.joml.Vector2i;
 //? 1.20.1 {
 /*import net.minecraftforge.client.ForgeHooksClient;
 *///?} else {
@@ -37,7 +22,7 @@ import java.util.List;
 public class ComponentTooltipsWidget extends AbstractTooltipsWidget {
     private ItemStack itemStack;
 
-    private List<? extends FormattedText> originals;
+    protected List<? extends FormattedText> originals;
     private List<? extends FormattedText> revealed;
     private List<ClientTooltipComponent> components;
 
@@ -82,7 +67,7 @@ public class ComponentTooltipsWidget extends AbstractTooltipsWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         Font font = Minecraft.getInstance().font;
-        ((GuiGraphicsInvoker) guiGraphics).tc$renderTooltipInternal(font, this.components, getX(), getY(), positioner);
+        ((GuiGraphicsInvoker) guiGraphics).tc$renderTooltipInternal(font, getClientTooltipComponent(), getX(), getY(), positioner);
     }
 
     @Override

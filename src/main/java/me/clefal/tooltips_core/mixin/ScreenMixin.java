@@ -129,6 +129,11 @@ public abstract class ScreenMixin implements ScreenDuck {
     public <T extends GuiEventListener & NarratableEntry> T raiseToFirstWidget(T listener) {
         this.removeWidget(listener);
         this.addWidgetToFirst(listener);
+        if (listener instanceof AbstractTooltipsWidget widget){
+            if (this.fixedTooltips.remove(widget)){
+                addToFixed(widget);
+            }
+        }
         return listener;
     }
 

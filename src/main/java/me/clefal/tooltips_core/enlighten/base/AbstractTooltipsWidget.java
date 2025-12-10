@@ -6,7 +6,6 @@ import com.google.common.collect.HashBiMap;
 import lombok.Getter;
 import me.clefal.tooltips_core.TooltipsCore;
 import me.clefal.tooltips_core.enlighten.event.DirectlyAddEnlightenToFixedEvent;
-import me.clefal.tooltips_core.enlighten.handlers.EnlightenTooltipsWidget;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
 import me.clefal.tooltips_core.mixin.ClientTextTooltipAccess;
@@ -95,39 +94,51 @@ public abstract class AbstractTooltipsWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        ScreenDuck screen1 = (ScreenDuck) screen;
         if (isHovered) {
             if (button == 2){
-                if (this == screen1.tc$getCurrentFocusTooltips()) {
-                    screen1.addToFixed(this);
-                    screen1.tc$setCurrentFocusTooltips(null);
-                } else if (screen1.getAllFixed().contains(this)) {
-                    screen1.removeFromFixed(this);
-                }
+                onRightClick(mouseX, mouseY);
             } else if (button == 1) {
-                screen1.removeFromFixed(this);
+                onMiddleClick(mouseX, mouseY);
             } else if (button == 0) {
-                Style styleAt = getStyleAt(mouseX, mouseY, Minecraft.getInstance().font);
-                if (styleAt!= null && styleAt.getHoverEvent() != null && EnlightenUtil.isEnlighten(styleAt.getHoverEvent())){
-                    Component value = styleAt.getHoverEvent().getValue(HoverEvent.Action.SHOW_TEXT);
-                    if (value != null){
-                        Option<AbstractTooltipsWidget> sameTargetWidget = getSameTargetWidget(screen, styleAt.hashCode());
-                        if (sameTargetWidget.isEmpty()) {
-                            TooltipsCore.clientBus.post(new DirectlyAddEnlightenToFixedEvent(ItemStack.EMPTY, List.of(value.copy()), styleAt.hashCode()));
-                        } else {
-                            AbstractTooltipsWidget tooltipsWidget = sameTargetWidget.get();
-                            MemorizedTooltipsPositioner positioner1 = tooltipsWidget.positioner;
-                            positioner1.accurateLastPosition = new Vector2d(mouseX, mouseY);
-                            positioner1.lastPosition = new Vector2i(((int) positioner1.accurateLastPosition.x), ((int) positioner1.accurateLastPosition.y));
-
-                            tooltipsWidget.setPosition(positioner1.lastPosition.x, positioner1.lastPosition.y);
-                        }
-                    }
-                }
+                onLeftClick(mouseX, mouseY);
             }
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    protected void onLeftClick(double mouseX, double mouseY) {
+        Style styleAt = getStyleAt(mouseX, mouseY, Minecraft.getInstance().font);
+        if (styleAt!= null && styleAt.getHoverEvent() != null && EnlightenUtil.isEnlighten(styleAt.getHoverEvent())){
+            Component value = styleAt.getHoverEvent().getValue(HoverEvent.Action.SHOW_TEXT);
+            if (value != null){
+                Option<AbstractTooltipsWidget> sameTargetWidget = getSameTargetWidget(screen, styleAt.hashCode());
+                if (sameTargetWidget.isEmpty()) {
+                    TooltipsCore.clientBus.post(new DirectlyAddEnlightenToFixedEvent(ItemStack.EMPTY, List.of(value.copy()), styleAt.hashCode()));
+                } else {
+                    AbstractTooltipsWidget tooltipsWidget = sameTargetWidget.get();
+                    MemorizedTooltipsPositioner positioner1 = tooltipsWidget.positioner;
+                    positioner1.accurateLastPosition = new Vector2d(mouseX, mouseY);
+                    positioner1.lastPosition = new Vector2i(((int) positioner1.accurateLastPosition.x), ((int) positioner1.accurateLastPosition.y));
+
+                    tooltipsWidget.setPosition(positioner1.lastPosition.x, positioner1.lastPosition.y);
+                }
+            }
+        }
+    }
+
+    protected void onMiddleClick(double mouseX, double mouseY) {
+        ((ScreenDuck) this.screen).removeFromFixed(this);
+    }
+
+    protected void onRightClick(double mouseX, double mouseY) {
+        ScreenDuck screen1 = (ScreenDuck) this.screen;
+        if (this == screen1.tc$getCurrentFocusTooltips()) {
+            screen1.addToFixed(this);
+            screen1.tc$setCurrentFocusTooltips(null);
+        } else if (screen1.getAllFixed().contains(this)) {
+            screen1.removeFromFixed(this);
+        }
     }
 
     public abstract List<ClientTooltipComponent> getClientTooltipComponent();

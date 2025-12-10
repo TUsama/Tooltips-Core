@@ -1,0 +1,60 @@
+{
+  "mmorpg.tag.spell.buff.enlighten": "[*](buff)",
+  "enlighten.term.buff": "Buffs are effects that boost a player or monster's stats for a duration or while a condition is met.\n\nUnless otherwise stated, Buffs of the same type do not stack — only the copy with the strongest effect applies.",
+  "mmorpg.tag.spell.area.enlighten": "[*](area)",
+  "enlighten.term.area": "This Skill has an effect that applies to every target in its area, rather than picking specific targets.",
+
+  "mmorpg.tag.spell.cast_speed_to_cooldown": "Hastebound",
+  "mmorpg.tag.spell.cast_speed_to_cooldown.enlighten": "[*](cast_speed_to_cooldown)",
+  "enlighten.term.cast_speed_to_cooldown": "When cast, Hastebound will count the cast speed as cooldown.",
+
+  "mmorpg.tag.spell.chaining.enlighten": "[*](chaining)",
+  "enlighten.term.chaining": "Effects that Chain are redirected to another target after hitting an enemy.\n\nProjectiles have a base chaining distance of 5 metres. Enemies can be Hit more than once in the same Chain.",
+
+  "mmorpg.tag.spell.curse.enlighten": "[*](curse)",
+  "enlighten.term.curse":"Curses significantly [Debuff](debuff) affected targets.\n\nDifferent Curses can exist on the same target at the same time.",
+
+  "mmorpg.tag.spell.damage.enlighten": "[*](damage)",
+  "enlighten.term.damage":"Damage are spells that do damage to the targets.",
+
+  "mmorpg.tag.spell.heal.enlighten": "[*](heal)",
+  "enlighten.term.heal":"Heal are spells that replenish health of the targets",
+
+  "mmorpg.tag.spell.magic.enlighten": "[*](magic)",
+  "enlighten.term.magic":"Magic are spells that use raw magic to destroy your enemies.\n\n[Weapon skill](weapon_skill) are not Magics.",
+
+  "mmorpg.tag.spell.melee.enlighten": "[*](melee)",
+  "enlighten.term.melee":"Melee spells are those that directly hit with a melee Strike or a Slam, dealing Melee damage.\n\nAny Projectiles these spells create do not count as Melee damage.",
+
+  "mmorpg.tag.spell.movement.enlighten": "[*](movement)",
+  "enlighten.term.movement":"Movement are spells that allow you to move for a distance.",
+
+  "mmorpg.tag.spell.not_affected_by_cast_speed": "Stasis",
+  "mmorpg.tag.spell.not_affected_by_cast_speed.enlighten": "[*](not_affected_by_cast_speed)",
+  "enlighten.term.not_affected_by_cast_speed":"When cast, cast speed will not affect Stasis.",
+
+  "mmorpg.tag.spell.projectile.enlighten": "[*](projectile)",
+  "enlighten.term.projectile": "A Projectile is a moving object or [Spell](spell) that usually impacts with targets when it hits them.\n\nWhen a group of multiple Projectiles is fired from the same source at the same time, a single target can be hit by all Projectiles unless otherwise specified.",
+  "enlighten.term.spell": "In MAS, all learnable skills will be considered as Spell.\n\nThe stat of Spell is fully determined by caster's stat.",
+
+  "mmorpg.tag.spell.rejuvenate.enlighten": "[*](rejuvenate)",
+  "enlighten.term.rejuvenate":"Rejuvenate heal target over time.\n\nRejuvenate isn't [Buff](buff).",
+
+  "mmorpg.tag.spell.self_damage.enlighten": "[*](self_damage)",
+  "enlighten.term.self_damage":"Self damage are spells that do damage to its caster, the damage won't be calculating again when cast.",
+
+  "mmorpg.tag.spell.shatter.enlighten": "[*](shatter)",
+  "enlighten.term.shatter":"Shatter are spells that trigger the [Freeze](freeze) build up, release all accumulated damage as bonus §b☀ Cold§7§9 Damage.",
+
+  "mmorpg.tag.spell.summon.enlighten": "[*](summon)",
+  "enlighten.term.summon":"Summons are spells that summon temporary [Allies](allies) which will accompany and fight alongside you.\n\nBy default, player can only have 3 summoned allies at most.",
+
+  "mmorpg.tag.spell.thorns.enlighten": "[*](thorns)",
+  "enlighten.term.thorns":"Thorns are spells that can apply Thorned to enemy.",
+
+  "mmorpg.tag.spell.trap.enlighten": "[*](trap)",
+  "enlighten.term.trap":"Traps are constructs which will be trigger when enemy getting closer. \n\nTraps doesn't have quantity limitation.",
+
+  "mmorpg.tag.spell.weapon_skill.enlighten": "[*](weapon_skill)",
+  "enlighten.term.weapon_skill":"Weapon skill are spells that directly use your equipped weapon to damage enemies. \n\nWeapon skill do not necessarily deal Physical damage — they can deal any damage type."
+}

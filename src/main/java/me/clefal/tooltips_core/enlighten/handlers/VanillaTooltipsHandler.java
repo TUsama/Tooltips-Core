@@ -1,6 +1,5 @@
 package me.clefal.tooltips_core.enlighten.handlers;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import me.clefal.tooltips_core.enlighten.base.AbstractTooltipsWidget;
 import me.clefal.tooltips_core.enlighten.base.BypassTooltipsPositioner;
 import me.clefal.tooltips_core.enlighten.base.MemorizedTooltipsPositioner;
@@ -79,7 +78,7 @@ public class VanillaTooltipsHandler {
     @SubscribeEvent
     public void OnScreenPre(ScreenEvent.Render.Pre event) {
         if (TooltipsRecorder.ifTooltipsRecordPending()) {
-            TooltipsRecorder.getPendingTooltips().setUpWidget(event);
+            event.getScreen().setFocused(TooltipsRecorder.getPendingTooltips().setUpWidget(event));;
             TooltipsRecorder.setPendingTooltips(null);
         }
 
@@ -94,15 +93,20 @@ public class VanillaTooltipsHandler {
         List<AbstractTooltipsWidget> all = ((ScreenDuck) screen).getAll();
         GuiGraphics guiGraphics = event.getGuiGraphics();
 
-        for (AbstractTooltipsWidget tooltipsWidget : all) {
+        for (int i = 0; i < all.size(); i++) {
+            AbstractTooltipsWidget tooltipsWidget = all.get(i);
             guiGraphics.pose().pushPose();
             if (tooltipsWidget.isFocused()) {
-                guiGraphics.pose().translate(0, 0, 200);
+                guiGraphics.pose().translate(0, 0, all.size() * 400);
                 ((ScreenDuck) screen).raiseToFirstWidget(tooltipsWidget);
+            } else {
+                guiGraphics.pose().translate(0, 0, i * 400);
             }
             tooltipsWidget.render(event.getGuiGraphics(), event.getMouseX(), event.getMouseY(), event.getPartialTick());
             guiGraphics.pose().popPose();
         }
+
+
 
 
     }

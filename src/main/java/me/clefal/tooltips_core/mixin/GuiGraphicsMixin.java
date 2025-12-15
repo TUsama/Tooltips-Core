@@ -8,8 +8,11 @@ import me.clefal.tooltips_core.enlighten.base.BypassTooltipsPositioner;
 import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
 import me.clefal.tooltips_core.enlighten.utils.MixinMethod;
+import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
@@ -126,7 +129,8 @@ public abstract class GuiGraphicsMixin {
             ArrayList<? extends FormattedCharSequence> formattedCharSequences = new ArrayList<>(tooltipLines);
             formattedCharSequences.remove(formattedCharSequences.size() - 1);
             instance.pose().pushPose();
-            instance.pose().translate(0, 0, 400);
+            ScreenDuck screen = ((ScreenDuck) Minecraft.getInstance().screen);
+            instance.pose().translate(0, 0, (screen.getAll().size() + 1) * 400);
             this.renderTooltipInternal(
                     font,
                     formattedCharSequences.stream().map(ClientTooltipComponent::create).collect(Collectors.toList()),

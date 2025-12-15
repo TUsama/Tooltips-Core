@@ -22,7 +22,8 @@
   ],
   "mixins": [
     "FontMixin",
-    "MutableComponentMixin"
+    "MutableComponentMixin",
+    "mas.DisableFormulaMixin"
   ],
   "mixinextras": {
     "minVersion": "0.5.0"

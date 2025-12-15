@@ -12,49 +12,129 @@
   "enlighten.term.chaining": "Effects that Chain are redirected to another target after hitting an enemy.\n\nProjectiles have a base chaining distance of 5 metres. Enemies can be Hit more than once in the same Chain.",
 
   "mmorpg.tag.spell.curse.enlighten": "[*](curse)",
-  "enlighten.term.curse":"Curses significantly [Debuff](debuff) affected targets.\n\nDifferent Curses can exist on the same target at the same time.",
+  "enlighten.term.curse":"Curses significantly weaken affected targets.\n\nDifferent Curses can exist on the same target at the same time.\n\nCurses are not [Debuff](debuff).",
 
   "mmorpg.tag.spell.damage.enlighten": "[*](damage)",
   "enlighten.term.damage":"Damage are spells that do damage to the targets.",
 
   "mmorpg.tag.spell.heal.enlighten": "[*](heal)",
-  "enlighten.term.heal":"Heal are spells that replenish health of the targets",
+  "enlighten.term.heal":"Heal are skills that replenish health of the targets",
 
   "mmorpg.tag.spell.magic.enlighten": "[*](magic)",
-  "enlighten.term.magic":"Magic are spells that use raw magic to destroy your enemies.\n\n[Weapon skill](weapon_skill) are not Magics.",
+  "enlighten.term.magic":"Magic are skills that use raw magic to achieve some effects.\n\n[Attack skill](weapon_skill) are not Magics.",
 
   "mmorpg.tag.spell.melee.enlighten": "[*](melee)",
-  "enlighten.term.melee":"Melee spells are those that directly hit with a melee Strike or a Slam, dealing Melee damage.\n\nAny Projectiles these spells create do not count as Melee damage.",
+  "enlighten.term.melee":"Melee skills are those that directly hit with a melee action, dealing Melee damage.\n\nAny [Projectiles](projectile) these skills create do not count as Melee damage.",
 
   "mmorpg.tag.spell.movement.enlighten": "[*](movement)",
-  "enlighten.term.movement":"Movement are spells that allow you to move for a distance.",
+  "enlighten.term.movement":"Movement are skills that allow you to move for a distance.",
 
   "mmorpg.tag.spell.not_affected_by_cast_speed": "Stasis",
   "mmorpg.tag.spell.not_affected_by_cast_speed.enlighten": "[*](not_affected_by_cast_speed)",
   "enlighten.term.not_affected_by_cast_speed":"When cast, cast speed will not affect Stasis.",
 
   "mmorpg.tag.spell.projectile.enlighten": "[*](projectile)",
-  "enlighten.term.projectile": "A Projectile is a moving object or [Spell](spell) that usually impacts with targets when it hits them.\n\nWhen a group of multiple Projectiles is fired from the same source at the same time, a single target can be hit by all Projectiles unless otherwise specified.",
-  "enlighten.term.spell": "In MAS, all learnable skills will be considered as Spell.\n\nThe stat of Spell is fully determined by caster's stat.",
+  "enlighten.term.projectile": "A Projectile is a moving object or [Skill](spell) that usually impacts with targets when it hits them.\n\nWhen a group of multiple Projectiles is fired from the same source at the same time, a single target can be hit by all Projectiles unless otherwise specified.",
+  "enlighten.term.spell": "In CTE2, all learnable object in Class screen will be considered as Skill.\n\nThe stat of Skill is fully determined by caster's stat, skill level only affect the available slots of support gem.",
 
   "mmorpg.tag.spell.rejuvenate.enlighten": "[*](rejuvenate)",
   "enlighten.term.rejuvenate":"Rejuvenate heal target over time.\n\nRejuvenate isn't [Buff](buff).",
 
   "mmorpg.tag.spell.self_damage.enlighten": "[*](self_damage)",
-  "enlighten.term.self_damage":"Self damage are spells that do damage to its caster, the damage won't be calculating again when cast.",
+  "enlighten.term.self_damage":"Self damage are skills that do damage to its caster, the damage won't be calculating again when cast.",
 
   "mmorpg.tag.spell.shatter.enlighten": "[*](shatter)",
-  "enlighten.term.shatter":"Shatter are spells that trigger the [Freeze](freeze) build up, release all accumulated damage as bonus §b☀ Cold§7§9 Damage.",
+  "enlighten.term.shatter":"Shatter are skills that trigger the [Freeze](freeze) build up, Extract all [Accumulated](accumulate) damage as bonus §b☀ Cold§7§9 Damage.",
 
   "mmorpg.tag.spell.summon.enlighten": "[*](summon)",
-  "enlighten.term.summon":"Summons are spells that summon temporary [Allies](allies) which will accompany and fight alongside you.\n\nBy default, player can only have 3 summoned allies at most.",
+  "enlighten.term.summon":"Summons are skills that summon temporary [Allies](allies) which will accompany and fight alongside you.\n\nBy default, player can only have 3 summoned allies at most.",
 
   "mmorpg.tag.spell.thorns.enlighten": "[*](thorns)",
-  "enlighten.term.thorns":"Thorns are spells that can apply Thorned to enemy.",
+  "enlighten.term.thorns":"Thorns are skills that can apply [Thorn](thorn) to enemy.",
+  "enlighten.term.thorn":"Thorn is a effect, it'll be consume when hit by basic attack, and deal damage.",
 
   "mmorpg.tag.spell.trap.enlighten": "[*](trap)",
   "enlighten.term.trap":"Traps are constructs which will be trigger when enemy getting closer. \n\nTraps doesn't have quantity limitation.",
 
   "mmorpg.tag.spell.weapon_skill.enlighten": "[*](weapon_skill)",
-  "enlighten.term.weapon_skill":"Weapon skill are spells that directly use your equipped weapon to damage enemies. \n\nWeapon skill do not necessarily deal Physical damage — they can deal any damage type."
+  "enlighten.term.weapon_skill":"Attack skill are skills that directly use your equipped weapon to damage enemies. \n\nAttack skill do not necessarily deal Physical damage — they can deal any damage type.",
+
+
+  "mmorpg.tag.spell.burst.enlighten": "[*](burst)",
+  "enlighten.term.burst":"Burst are skills that can trigger the Elemental Burst when you have Mage Armor effect.",
+
+  "mmorpg.tag.spell.aura.enlighten": "[*](aura)",
+  "enlighten.term.aura":"Auras strengthen [Allies](allies) within a radius, or weaken enemies within a radius of the source of the Aura.\n\nAuras are not [Buff](buff), or [Debuff](debuff).",
+
+  "mmorpg.tag.spell.linker.enlighten": "[*](linker)",
+  "enlighten.term.linker":"Linkers required a Combo Starter to be casted, and generate a Combo Linker.",
+
+  "mmorpg.tag.spell.extender.enlighten": "[*](extender)",
+  "enlighten.term.extender":"Extenders required a Combo Linker to be casted, and generate a Combo Finisher.",
+
+  "mmorpg.tag.spell.finisher.enlighten": "[*](finisher)",
+  "enlighten.term.finisher":"Finishers are powerful skills that required a Combo Finisher to be casted. It won't generate anything after casted.",
+
+  "mmorpg.tag.spell.random_spread.enlighten": "[*](random_spread)",
+  "enlighten.term.random_spread":"Random Spreads usually will cast multiple [Projectiles](projectile), the spread of each projectile is random.",
+
+  "mmorpg.tag.spell.allies.enlighten": "[*](allies)",
+  "enlighten.term.allies":"Your allies include other players that on the same team with you, [Minions](minions), and any other entity that fights alongside you.\n\nYou do not count as your own Ally.",
+
+  "mmorpg.tag.spell.minions.enlighten": "[*](minions)",
+  "enlighten.term.minions":"Minions are summoned [Allies](allies) which will accompany and fight alongside you.",
+
+  "mmorpg.tag.spell.two_handed.enlighten": "[*](two_handed)",
+  "enlighten.term.two_handed":"Two-handed weapons take up both main hand and off hand slots when equipped.\n\nAnything on off hand can't be interacted when you are two-handed.",
+
+  "mmorpg.tag.spell.one_handed.enlighten": "[*](one_handed)",
+  "enlighten.term.one_handed":"One-handed weapons can be placed in the main hand or off hand slot. all one-handed weapon types can be dual wielded in both main and off hand slots.",
+
+  "enlighten.term.support_gem":"Support Gems can be inserted into sockets on a Skill Gem in order to modify the effects of that Skill. They only apply to the Skill Gem they are socketed into.\n\nCannot use multiple Support Gems of the same Kind in one Skill.\n\nThe number of available Support Gem slot is depend on the Skill level.",
+
+  "mmorpg.ailment.bleed.enlighten": "[*](bleed)",
+  "mmorpg.ailment.burn.enlighten": "[*](burn)",
+  "mmorpg.ailment.electrify.enlighten": "[*](electrify)",
+  "mmorpg.ailment.freeze.enlighten": "[*](freeze)",
+  "mmorpg.ailment.poison.enlighten": "[*](poison)",
+  "enlighten.term.ailment":"Ailments are a family of common effects associated with specific [Damage Types](damage_types). The list of Ailments is: [Bleed](bleed), [Burn](burn), [Freeze](freeze), [Electrify](electrify), and [Poison](poison).",
+
+  "enlighten.term.damage_types":"The damage types are [Physical](physical_damage), [Fire](fire_damage), [Cold](cold_damage), [Lightning](lightning_damage) and [Chaos](chaos_damage).",
+
+  "enlighten.term.physical_damage":"Physical damage is one of the five [Damage Types](damage_types). It is the most common and the only one reduced by Armour, rather than by a [Resistance](resistances).\n\nPhysical damage over time can be inflicted with [Bleed](bleed).",
+  "enlighten.term.bleed":"Bleed is an [Ailment](ailment) that deals Physical damage over time, and lasts 5 seconds by default.",
+
+  "enlighten.term.fire_damage":"Fire damage is one of the five Damage Types. It is reduced by Fire [Resistance](resistances).\n\nThe corresponding [Ailment](ailment) is [Burn](burn).",
+
+  "enlighten.term.burn":"Burn is an [Ailment](ailment) that deals Fire damage over time, and lasts for 3 seconds by default.",
+
+  "enlighten.term.cold_damage":"Cold damage is one of the five [Damage Types](damage_types). It is reduced by Cold [Resistance](resistances). Cold hits have a chance to build up [Freeze](freeze),",
+
+  "enlighten.term.freeze":"Freeze is an [Ailment](ailment) that slow targets and [accumulate](accumulate) damage, and lasts forever.\n\nThe accumulate damage will be Extracted when target get hit by Shatter.",
+
+  "mmorpg.ailment.desc.electrify.enlighten": "[Accumulates](accumulate)",
+  "mmorpg.ailment.desc.freeze.enlighten": "[Accumulates](accumulate)",
+  "enlighten.term.accumulate":"Some [Skills](skill) or [Ailments](ailment) will accumulate damage when they hit or apply, Those damage can be Extracted when it meet specific condition.",
+
+  "enlighten.term.lightning_damage":"Lightning damage is one of the five [Damage Types](damage_types). It is reduced by Lightning [Resistance](resistances). Lightning hits have a chance to [Electrify](electrify) enemy.",
+  "enlighten.term.electrify":"Electrify is an [Ailment](ailment) that can [accumulate](accumulate) all damage, and lasts forever.\n\nThe accumulate damage will be Extracted when target get Shock.",
+
+  "enlighten.term.shock":"Shock is a effect that can Extract [Accumulated] damage generated by [Electrify](electrify).",
+
+  "enlighten.term.chaos_damage":"Chaos damage is one of the five [Damage Types](damage_types). It is reduced by Chaos [Resistance](resistances). Chaos hits have a chance to Poison enemy.\n\nChaos damage is the least common damage type.",
+  "enlighten.term.poison":"Poison is an [Ailment](ailment) that deals Chaos damage over time, and lasts for 10 seconds by default.",
+
+  "enlighten.term.resistances":"Resistances reduce damage taken of the corresponding damage type — [Physical](physical_damage), [Fire](fire_damage), [Cold](cold_damage), [Lightning](lightning_damage) or [Chaos](chaos_damage) — up to a Maximum. Fire, Cold and Lightning Resistances are Elemental Resistances.\n\nPlayer resistances are lowered as you level up, and can be improved with Equipment, Passives & Quest items.\n\nThere are also resistances for [Ailment](ailment), these resistances can reduce the chance of you inflict corresponding Ailment.",
+
+  "enlighten.term.armour":"Armour reduces Damage taken from Hits. By default, Armour only applies to [Physical Damage](physical_damage).\n\nDamage reduction from Armour is proportional to the amount of Damage.",
+  "enlighten.term.evasion":"Evasion Rating grants a chance to Evade enemy Hits, preventing them from Hitting you at all. Exact chance to Evade also depends on the attacker's Accuracy.",
+
+
+  "enlighten.term.attributes":"Strength, Dexterity, and Intelligence are the 3 primary attributes. The most important use of Attributes is to meet requirements to use Equipment.\n\nEach Attribute provides a different inherent bonus.",
+
+  "enlighten.term.low_health":"A player or monster is on Low health if it has 30% of its Maximum health/Magic Shield or less.\n\nOnly check the higher one if both exist.",
+  "enlighten.term.low_mana":"You are on Low Mana if you have 30% of your Maximum Mana or less.",
+
+  "mmorpg.stat.gear_defense.enlighten": "[*](defences)",
+  "enlighten.term.defences":"[Armour](armour), [Evasion Rating](evasion) and Magic Shield are the standard Defences. \n\nOther protective stats such as [Resistances](resistances) are not counted as Defences."
 }

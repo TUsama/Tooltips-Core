@@ -82,8 +82,9 @@ public abstract class AbstractTooltipsWidget extends AbstractWidget {
             }
 
         }
-        guiGraphics.blit(PIN, getX() + width, getY() - 10, 5, 5, 0, 0, 32, 32, 32, 32);
-
+        if (isPositionInit){
+            guiGraphics.blit(PIN, getX() + width, getY() - 10, 5, 5, 0, 0, 32, 32, 32, 32);
+        }
         Style styleAt = getStyleAt(mouseX, mouseY, font);
         if (styleAt != null && styleAt.getHoverEvent() != null){
             if (getSameTargetWidget(screen, styleAt.hashCode()).isEmpty()) {

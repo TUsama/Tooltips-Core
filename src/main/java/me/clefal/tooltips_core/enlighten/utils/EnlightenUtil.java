@@ -276,7 +276,6 @@ public class EnlightenUtil {
                 result.add(input.substring(index, best.start()));
             }
 
-            // ★ 关键：这里得到的是 “§r§7Gear Defense”
             result.add(best.group());
 
             index = best.end();
@@ -286,7 +285,6 @@ public class EnlightenUtil {
     }
 
     private static Pattern compileMcPattern(String literal) {
-        // (§.)* + Gear Defense（逐字转义）
         String regex = "(?:§.)*" + Pattern.quote(literal);
         return Pattern.compile(regex);
     }

@@ -107,7 +107,9 @@ public class VanillaTooltipsHandler {
         }
 
 
-
+        if (!Screen.hasAltDown() && ((ScreenDuck) screen).tc$getCurrentFocusTooltips() != null) {
+            ((ScreenDuck) screen).resetCurrentFocusTooltips();
+        }
 
     }
 

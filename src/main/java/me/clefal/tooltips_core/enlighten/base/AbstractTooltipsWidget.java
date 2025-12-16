@@ -84,18 +84,21 @@ public abstract class AbstractTooltipsWidget extends AbstractWidget {
         }
         if (isPositionInit){
             guiGraphics.blit(PIN, getX() + width, getY() - 10, 5, 5, 0, 0, 32, 32, 32, 32);
-        }
-        Style styleAt = getStyleAt(mouseX, mouseY, font);
-        if (styleAt != null && styleAt.getHoverEvent() != null){
-            if (getSameTargetWidget(screen, styleAt.hashCode()).isEmpty()) {
-                guiGraphics.renderComponentHoverEffect(font, styleAt, mouseX, mouseY);
+            //put this here can fix a glitch, see postRenderTooltipsWidget method.
+            Style styleAt = getStyleAt(mouseX, mouseY, font);
+            if (styleAt != null && styleAt.getHoverEvent() != null){
+                if (getSameTargetWidget(screen, styleAt.hashCode()).isEmpty()) {
+                    guiGraphics.renderComponentHoverEffect(font, styleAt, mouseX, mouseY);
+                }
             }
         }
+
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isHovered) {
+            System.out.println("click!");
             if (button == 2){
                 onRightClick(mouseX, mouseY);
             } else if (button == 1) {
@@ -129,15 +132,19 @@ public abstract class AbstractTooltipsWidget extends AbstractWidget {
     }
 
     protected void onMiddleClick(double mouseX, double mouseY) {
+
         ((ScreenDuck) this.screen).removeFromFixed(this);
     }
 
     protected void onRightClick(double mouseX, double mouseY) {
+        System.out.println("on right!");
         ScreenDuck screen1 = (ScreenDuck) this.screen;
         if (this == screen1.tc$getCurrentFocusTooltips()) {
+            System.out.println("add to fixed!");
             screen1.addToFixed(this);
             screen1.tc$setCurrentFocusTooltips(null);
         } else if (screen1.getAllFixed().contains(this)) {
+            System.out.println("removed!");
             screen1.removeFromFixed(this);
         }
     }

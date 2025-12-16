@@ -23,8 +23,6 @@ public interface ScreenDuck {
 
     void removeFromFixed(AbstractTooltipsWidget widget);
 
-    void addToRemoved(AbstractTooltipsWidget widget);
-
     Set<AbstractTooltipsWidget> getAllFixed();
 
     List<AbstractTooltipsWidget> getAll();
@@ -34,4 +32,6 @@ public interface ScreenDuck {
     <T extends GuiEventListener & NarratableEntry> T addWidgetToFirst(T listener);
 
     <T extends GuiEventListener & NarratableEntry> T raiseToFirstWidget(T listener);
+
+    void resetCurrentFocusTooltips();
 }

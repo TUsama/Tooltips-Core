@@ -13,7 +13,8 @@
   ],
   "mixins": [
     "mas.DisableStatDescMixin",
-    "mas.DisableLevelDescMixin"
+    "mas.DisableLevelDescMixin",
+    "mas.DisableFormulaMixin"
   ],
   "mixinextras": {
     "minVersion": "0.5.0"

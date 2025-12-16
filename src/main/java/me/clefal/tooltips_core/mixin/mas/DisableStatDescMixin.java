@@ -1,4 +1,5 @@
-package me.clefal.tooltips_core.mixin.mas;
+//? 1.20.1 {
+/*package me.clefal.tooltips_core.mixin.mas;
 
 import com.robertx22.mine_and_slash.database.data.stats.Stat;
 import net.minecraft.network.chat.MutableComponent;
@@ -19,3 +20,4 @@ public class DisableStatDescMixin {
 
 
 }
+*///?}

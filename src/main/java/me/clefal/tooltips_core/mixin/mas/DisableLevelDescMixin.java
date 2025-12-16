@@ -1,4 +1,5 @@
-package me.clefal.tooltips_core.mixin.mas;
+//? 1.20.1 {
+/*package me.clefal.tooltips_core.mixin.mas;
 
 import com.google.common.collect.ImmutableList;
 import com.robertx22.mine_and_slash.gui.texts.textblocks.RequirementBlock;
@@ -17,3 +18,4 @@ public class DisableLevelDescMixin {
         return instance;
     }
 }
+*///?}

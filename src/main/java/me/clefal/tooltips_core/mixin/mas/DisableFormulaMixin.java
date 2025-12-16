@@ -1,4 +1,5 @@
-package me.clefal.tooltips_core.mixin.mas;
+//? 1.20.1 {
+/*package me.clefal.tooltips_core.mixin.mas;
 
 import com.robertx22.mine_and_slash.database.data.stats.tooltips.NormalStatTooltip;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,3 +15,4 @@ public class DisableFormulaMixin {
         return false;
     }
 }
+*///?}

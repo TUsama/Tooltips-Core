@@ -97,7 +97,7 @@ public class MixinMethod {
 
         Component component1 = ((Component) EnlightenUtil.reveal(tuple2._2).get(0));
 
-        if (EnlightenUtil.isNested(component1)) component1 = EnlightenUtil.revealNestedEnlighten(component1.copy());
+        //if (EnlightenUtil.isNested(component1)) component1 = EnlightenUtil.revealNestedEnlighten(component1.copy());
 
         if (!SaveCurrentComponentsEvent.tryPost(List.of(component1), stack)) {
             List<FormattedCharSequence> split = new ArrayList<>(font.split(component1, Math.max(width / 2, 200)));

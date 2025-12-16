@@ -27,7 +27,7 @@ public class EnlightenTooltipsWidget extends ComponentTooltipsWidget {
     public EnlightenTooltipsWidget(int x, int y, int width, int height, List<? extends FormattedText> components, ItemStack itemStack, Screen screen, int hashcode) {
         super(x, y, width, height, components, itemStack, screen);
         this.identifier = hashcode;
-        this.revealed = EnlightenUtil.revealNestedEnlighten(((Component) originals.get(0)));
+        this.revealed = ((Component) EnlightenUtil.reveal(originals).get(0));
 
 
         List<ClientTooltipComponent> clientTooltipComponents =

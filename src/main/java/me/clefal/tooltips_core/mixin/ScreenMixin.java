@@ -90,6 +90,14 @@ public abstract class ScreenMixin implements ScreenDuck {
     }
 
     @Override
+    public void resetCurrentFocusTooltips() {
+        if (!Screen.hasAltDown() && currentFocusTooltips != null) {
+            this.removeWidget(currentFocusTooltips);
+            currentFocusTooltips = null;
+        }
+    }
+
+    @Override
     public AbstractTooltipsWidget addToFixed(AbstractTooltipsWidget widget) {
         //only 21 has addFirst().
         ArrayList<AbstractTooltipsWidget> tooltipsWidgets = new ArrayList<>(this.fixedTooltips);
@@ -135,14 +143,6 @@ public abstract class ScreenMixin implements ScreenDuck {
             }
         }
         return listener;
-    }
-
-    @Inject(method = "tick", at = @At("TAIL"))
-    private void tc$tickRemoveCurrent(CallbackInfo ci) {
-        if (!Screen.hasAltDown() && currentFocusTooltips != null) {
-            this.removeWidget(currentFocusTooltips);
-            currentFocusTooltips = null;
-        }
     }
 
     @WrapOperation(method = "renderWithTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;II)V"))

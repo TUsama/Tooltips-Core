@@ -22,6 +22,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.MatchResult;
@@ -41,28 +42,36 @@ public class EnlightenUtil {
     public static List<? extends FormattedText> reveal(List<? extends FormattedText> components) {
         List<FormattedText> formattedTexts = new ArrayList<>();
         for (FormattedText component : components) {
+
             if (component instanceof MutableComponent comp) {
                 Component newComponent;
+                MutableComponent copy = comp.copy();
+                copy.getSiblings().clear();
                 if (comp.getContents() instanceof TranslatableContents contents) {
                     if (I18n.exists(getEnlighten.apply(contents.getKey()))) {
-                        newComponent = resolveEnlightenComponent(comp, Component.translatable(getEnlighten.apply(contents.getKey())));
+                        newComponent = resolveEnlightenComponent(copy, Component.translatable(getEnlighten.apply(contents.getKey())));
                     } else {
                         //TranslatableContents also can have internal enlighten.
-                        MutableComponent copy = comp.copy();
-                        copy.getSiblings().clear();
+
                         if (group.matcher(copy.getString()).find()){
-                            newComponent = revealNestedEnlighten(comp);
+                            newComponent = revealNestedEnlighten(copy);
+                        } else {
+                            newComponent = copy;
                         }
                     }
 
-                } else if (comp.getContents() instanceof PlainTextContents.LiteralContents contents && group.matcher(contents.text()).find()) {
-                    newComponent = revealNestedEnlighten(comp);
+                } else if (comp.getContents() instanceof
+                        //? 1.20.1 {
+                        /*LiteralContents
+                                *///?} else {
+                        PlainTextContents.LiteralContents
+                                //?}
+                                contents && group.matcher(contents.text()).find()) {
+                    newComponent = revealNestedEnlighten(copy);
                 } else {
-                    MutableComponent copy = comp.copy();
-                    copy.getSiblings().clear();
                     newComponent = copy;
-
                 }
+
                 tryAppendSiblings(comp, newComponent);
                 formattedTexts.add(newComponent);
 
@@ -112,20 +121,23 @@ public class EnlightenUtil {
             Set<String> matched = tuple2s1.keySet();
             MutableComponent newComp = MutableComponent.create(target.getContents());
             String string = newComp.getString();
+
+            Style newStyle = extractMcFormattingCodesAsStyle(string);
+            if (newStyle.equals(Style.EMPTY)){
+                newStyle = target.getStyle();
+            }
+            string = string.replaceAll("§.", "");
+
             List<String> strings1 = splitBySubstrings(string, matched.toJavaList());
             if (!strings1.isEmpty()) {
                 MutableComponent beginning = Component.literal("");
                 for (int i = 0; i < strings1.size(); i++) {
                     String s1 = strings1.get(i);
+                    Style finalNewStyle = newStyle;
                     strings.find(s1::contains)
-                            .onEmpty(() -> beginning.append(Component.literal(s1).withStyle(target.getStyle())))
+                            .onEmpty(() -> beginning.append(Component.literal(s1).withStyle(finalNewStyle)))
                             .forEach(x -> {
-                                if (s1.contains("§")){
-                                    Style newStyle = extractMcFormattingCodesAsStyle(s1);
-                                    beginning.append(Component.literal(s1.replaceAll("§.", "")).withStyle(newStyle.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s1.get(x).get()))).withUnderlined(true)));
-                                } else {
-                                    beginning.append(Component.literal(s1).withStyle(target.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s1.get(x).get()))).withUnderlined(true)));
-                                }
+                                beginning.append(Component.literal(s1).withStyle(finalNewStyle.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s1.get(x).get()))).withUnderlined(true)));
                             });
 
                 }
@@ -140,6 +152,68 @@ public class EnlightenUtil {
             return target;
         }
     }
+
+    public static Component revealNestedEnlighten(Component enlighten){
+        if (enlighten.getSiblings().isEmpty()) {
+            String string = enlighten.getString();
+            Matcher matcher = group.matcher(string);
+            Stream<MatchResult> matchResults = Stream.ofAll(matcher.results());
+            if (matchResults.isEmpty()) return enlighten.copy();
+
+
+
+            LinkedHashMap<String, MutableComponent> terms = LinkedHashMap.ofEntries(matchResults.map(x -> Tuple.of(
+                            x.group(1),
+                            Component.translatable(termFinder.apply(x.group(2)))
+                    ))
+                    .filter(tuple2 -> {
+                        boolean exists = ComponentUtils.isTranslationResolvable(tuple2._2());
+                        if (!exists) {
+                            TooltipsCore.LOGGER.warn("found non-exist term: {}", tuple2._2().getString());
+                        }
+                        return exists;
+                    }));
+            Matcher secondMatch = group.matcher(string);
+
+
+            StringBuilder sb = new StringBuilder();
+            while (secondMatch.find()) {
+                secondMatch.appendReplacement(sb, secondMatch.group(1));
+            }
+            secondMatch.appendTail(sb);
+            string = sb.toString();
+
+            Set<String> strings = terms.keySet();
+
+
+            List<Tuple2<String, Style>> results = consumeStyle(splitBySubstrings(string, strings));
+            //System.out.println(results);
+            if (!results.isEmpty()) {
+
+                MutableComponent beginning = Component.literal("");
+                Style lastStyle = Style.EMPTY;
+                for (int i = 0; i < results.size(); i++) {
+                    String s1 = results.get(i)._1;
+                    lastStyle = results.get(i)._2.isEmpty() ? lastStyle : results.get(i)._2;
+                    Style finalLastStyle = lastStyle;
+                    strings.find(s1::contains)
+                            .onEmpty(() -> beginning.append(Component.literal(s1).withStyle(finalLastStyle)))
+                            .forEach(x -> {
+                                beginning.append(Component.literal(s1).withStyle(finalLastStyle.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(terms.get(x).get()))).withUnderlined(true)));
+                            });
+                }
+                return beginning;
+            } else {
+                TooltipsCore.LOGGER.warn("Fail at splitting target: {}, the result string list is empty.", enlighten.getString());
+                return enlighten;
+            }
+        } else {
+            throw new RuntimeException("revealNestedEnlighten can only handle Component which don't have any sibling!");
+        }
+
+
+    }
+
 
     private static Map<String, Component> resolveEnlighten(Component component) {
         String string = component.getString();
@@ -213,65 +287,32 @@ public class EnlightenUtil {
 
     private static Pattern compileMcPattern(String literal) {
         // (§.)* + Gear Defense（逐字转义）
-        String regex = "(?:§[^r])*" + Pattern.quote(literal);
+        String regex = "(?:§.)*" + Pattern.quote(literal);
         return Pattern.compile(regex);
     }
 
-    public static Component revealNestedEnlighten(Component enlighten){
-        String string = enlighten.getString();
-        Matcher matcher = group.matcher(string);
+    private static List<Tuple2<String, Style>> consumeStyle(List<String> styledStrings){
+        ArrayList<Tuple2<String, Style>> results = new ArrayList<>();
+        Pattern compile = Pattern.compile("^(§.)+");
+        for (String styledString : styledStrings) {
+            results.add(Tuple.of(styledString.replaceAll("^(§.)+", ""), Stream.ofAll(compile.matcher(styledString).results())
+                    .map(x -> ChatFormatting.getByCode(x.group().replace("§", "").charAt(0)))
+                    .filter(Objects::nonNull)
+                    .transform(x -> {
+                        Style empty = Style.EMPTY;
+                        for (ChatFormatting chatFormatting : x) {
+                            empty = empty.applyFormat(chatFormatting);
+                        }
+                        return empty;
+                    })
 
-        Stream<MatchResult> matchResults = Stream.ofAll(matcher.results());
-        if (matchResults.isEmpty()) return enlighten.copy();
-
-        LinkedHashMap<String, MutableComponent> terms = LinkedHashMap.ofEntries(matchResults.map(x -> Tuple.of(
-                        x.group(1),
-                        Component.translatable(termFinder.apply(x.group(2)))
-                ))
-                .filter(tuple2 -> {
-                    boolean exists = ComponentUtils.isTranslationResolvable(tuple2._2());
-                    if (!exists) {
-                        TooltipsCore.LOGGER.warn("found non-exist term: {}", tuple2._2().getString());
-                    }
-                    return exists;
-                }));
-        Matcher secondMatch = group.matcher(string);
-
-
-        StringBuilder sb = new StringBuilder();
-        while (secondMatch.find()) {
-            secondMatch.appendReplacement(sb, secondMatch.group(1));
-        }
-        secondMatch.appendTail(sb);
-        string = sb.toString();
-
-        Set<String> strings = terms.keySet();
-
-        List<String> strings1 = splitBySubstrings(string, strings);
-        if (!strings1.isEmpty()) {
-
-            MutableComponent beginning = Component.literal("");
-            for (int i = 0; i < strings1.size(); i++) {
-                String s1 = strings1.get(i);
-                strings.find(s1::contains)
-                        .onEmpty(() -> beginning.append(Component.literal(s1).withStyle(enlighten.getStyle())))
-                        .forEach(x -> {
-                            if (s1.contains("§")){
-                                Style newStyle = extractMcFormattingCodesAsStyle(s1);
-                                beginning.append(Component.literal(s1.replaceAll("§.", "")).withStyle(newStyle.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(terms.get(x).get()))).withUnderlined(true)));
-                            } else {
-                                beginning.append(Component.literal(s1).withStyle(enlighten.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(terms.get(x).get()))).withUnderlined(true)));
-                            }
-
-                        });
-            }
-            return beginning;
-        } else {
-            TooltipsCore.LOGGER.warn("Fail at splitting target: {}, the result string list is empty.", enlighten.getString());
-            return enlighten;
+            ));
         }
 
+        return results;
     }
+
+
     public static Style extractMcFormattingCodesAsStyle(String input) {
         Style empty = Style.EMPTY;
         if (input == null || input.isEmpty()) {

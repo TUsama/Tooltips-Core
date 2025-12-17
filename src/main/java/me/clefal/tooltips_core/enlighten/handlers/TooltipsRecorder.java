@@ -67,7 +67,7 @@ public class TooltipsRecorder {
         @Override
         public ComponentTooltipsWidget setUpWidget(ScreenEvent.Render.Pre event) {
             Screen screen = event.getScreen();
-            ComponentTooltipsWidget componentTooltipsWidget = new ComponentTooltipsWidget(event.getMouseX(), event.getMouseY(), 100, 100, provide(), itemStack, screen);
+            ComponentTooltipsWidget componentTooltipsWidget = new ComponentTooltipsWidget(event.getMouseX(), event.getMouseY(), 5, 5, provide(), itemStack, screen);
             ((ScreenDuck) screen).addWidgetToFirst(componentTooltipsWidget);
             ((ScreenDuck) screen).tc$setCurrentFocusTooltips(componentTooltipsWidget);
 
@@ -94,7 +94,7 @@ public class TooltipsRecorder {
 
             } else {
 
-                fixed = new ComponentTooltipsWidget(event.getMouseX(), event.getMouseY(), 100, 100, provide(), itemStack, screen);
+                fixed = new ComponentTooltipsWidget(event.getMouseX(), event.getMouseY(), 5, 5, provide(), itemStack, screen);
 
             }
 

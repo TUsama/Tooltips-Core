@@ -5,6 +5,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import lombok.Getter;
 import me.clefal.tooltips_core.TooltipsCore;
+import me.clefal.tooltips_core.config.TooltipsCoreConfig;
 import me.clefal.tooltips_core.enlighten.event.DirectlyAddEnlightenToFixedEvent;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
@@ -98,7 +99,6 @@ public abstract class AbstractTooltipsWidget extends AbstractWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isHovered) {
-            System.out.println("click!");
             if (button == 2){
                 onRightClick(mouseX, mouseY);
             } else if (button == 1) {
@@ -137,14 +137,11 @@ public abstract class AbstractTooltipsWidget extends AbstractWidget {
     }
 
     protected void onRightClick(double mouseX, double mouseY) {
-        System.out.println("on right!");
         ScreenDuck screen1 = (ScreenDuck) this.screen;
         if (this == screen1.tc$getCurrentFocusTooltips()) {
-            System.out.println("add to fixed!");
             screen1.addToFixed(this);
             screen1.tc$setCurrentFocusTooltips(null);
         } else if (screen1.getAllFixed().contains(this)) {
-            System.out.println("removed!");
             screen1.removeFromFixed(this);
         }
     }

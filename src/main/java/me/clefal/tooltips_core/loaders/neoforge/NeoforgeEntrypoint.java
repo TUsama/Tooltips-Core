@@ -3,6 +3,7 @@ package me.clefal.tooltips_core.loaders.neoforge;
 
 import com.mojang.logging.LogUtils;
 import me.clefal.tooltips_core.TooltipsCore;
+import me.clefal.tooltips_core.config.TooltipsCoreConfig;
 import me.clefal.tooltips_core.enlighten.handlers.TooltipsListener;
 import me.clefal.tooltips_core.enlighten.handlers.VanillaTooltipsHandler;
 import net.neoforged.bus.api.IEventBus;
@@ -17,6 +18,7 @@ public class NeoforgeEntrypoint {
     public NeoforgeEntrypoint(IEventBus bus) {
         TooltipsCore.clientBus.register(new TooltipsListener());
         NeoForge.EVENT_BUS.register(new VanillaTooltipsHandler());
+        TooltipsCoreConfig.init();
     }
 }
 //?}

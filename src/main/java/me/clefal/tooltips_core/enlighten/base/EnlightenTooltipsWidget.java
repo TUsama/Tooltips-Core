@@ -1,22 +1,19 @@
 package me.clefal.tooltips_core.enlighten.base;
 
-import com.clefal.nirvana_lib.relocated.io.vavr.control.Option;
-import me.clefal.tooltips_core.TooltipsCore;
-import me.clefal.tooltips_core.enlighten.event.DirectlyAddEnlightenToFixedEvent;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.ForgeHooksClient;
-import org.joml.Vector2d;
-import org.joml.Vector2i;
 
-import java.util.ArrayList;
+import net.minecraft.world.item.ItemStack;
+//? 1.20.1 {
+/*import net.minecraftforge.client.ForgeHooksClient;
+*///?} else {
+import net.neoforged.neoforge.client.ClientHooks;
+//?}
+
 import java.util.List;
 
 public class EnlightenTooltipsWidget extends ComponentTooltipsWidget {

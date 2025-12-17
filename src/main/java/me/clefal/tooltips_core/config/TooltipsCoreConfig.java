@@ -14,7 +14,8 @@ public class TooltipsCoreConfig extends Config {
     public TooltipsCoreConfig() {
         super(ResourceLocationUtils.make(TooltipsCore.MOD_ID, "config"));
     }
-    public static void init(){
 
+    public static void init() {
+        TooltipsCore.LOGGER.info("Initiating Tooltips Core Config!");
     }
 }

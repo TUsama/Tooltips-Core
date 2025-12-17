@@ -1,7 +1,9 @@
 import dev.isxander.modstitch.base.moddevgradle.MDGType
+import org.gradle.kotlin.dsl.add
 
 plugins {
     id("dev.isxander.modstitch.base") version "0.7.1-unstable"
+    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
 }
 
 fun prop(name: String, consumer: (prop: String) -> Unit) {
@@ -214,7 +216,7 @@ dependencies {
     prop("deps.fabricapi"){
         modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:$it")
     }
-
+    //println(modstitch.finalJarTask.map { "test:" + it.archiveFile.get().asFile.name })
 
     modstitch.moddevgradle {
         if (modstitch.isModDevGradleLegacy){
@@ -245,3 +247,40 @@ dependencies {
         }
     }
 }
+publishMods {
+
+    dryRun.set(false)
+
+    afterEvaluate {
+        file = modstitch.finalJarTask.flatMap { it.archiveFile }
+        this@publishMods.displayName.set(file.map { it.asFile.name })
+    }
+
+
+    changelog = file("../../changelog.md")
+        .readLines()
+        .joinToString("\n") { line ->
+            if (line.isNotBlank()) {
+                "$line</br>"
+            } else {
+                line
+            }
+        }
+    type = ALPHA
+    modLoaders.add(loader)
+
+
+
+    curseforge {
+        accessToken = file("D:\\curseforge-key.txt").readText()
+        projectId = "1406422"
+        minecraftVersions.add(minecraft)
+        serverRequired = false
+        clientRequired = true
+        javaVersions.set(listOf<JavaVersion>(JavaVersion.VERSION_17))
+        requires("nirvana-library")
+
+    }
+
+}
+

@@ -41,8 +41,9 @@ public class MixinMethod {
 
     public static boolean tryDrawDashedLine(float u0, float v0, float u1, float v1, BakedGlyph.Effect effect, Matrix4f matrix, VertexConsumer buffer, int packedLight) {
         if (effect instanceof DashedLineEffect && effect instanceof BakedGlyphAccessor accessor) {
-            float x0 = accessor.getX0();
-            float x1 = Math.max(2 + accessor.getX0(), accessor.getX1() - 3);
+            float x0 = accessor.getX0() + 1;
+            float x1 = x0 + 4;
+
             //? 1.20.1 {
             /*buffer.vertex(matrix, x0, accessor.getY0(), accessor.getDepth())
                     .color(accessor.getR(), accessor.getG(), accessor.getB(), accessor.getA())

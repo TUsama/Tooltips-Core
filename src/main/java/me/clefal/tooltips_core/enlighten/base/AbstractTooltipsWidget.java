@@ -10,6 +10,7 @@ import me.clefal.tooltips_core.enlighten.event.DirectlyAddEnlightenToFixedEvent;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
 import me.clefal.tooltips_core.mixin.ClientTextTooltipAccess;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -84,6 +85,10 @@ public abstract class AbstractTooltipsWidget extends AbstractWidget {
 
         }
         if (isPositionInit){
+
+            int i = 5;
+            this.isHovered = guiGraphics.containsPointInScissor(mouseX, mouseY) && mouseX >= this.getX() - i - 2 && mouseY >= this.getY() - i && mouseX < this.getX() + this.width + i && mouseY < this.getY() + this.height + i;
+
             guiGraphics.blit(PIN, getX() + width, getY() - 10, 5, 5, 0, 0, 32, 32, 32, 32);
             //put this here can fix a glitch, see postRenderTooltipsWidget method.
             Style styleAt = getStyleAt(mouseX, mouseY, font);
@@ -92,6 +97,7 @@ public abstract class AbstractTooltipsWidget extends AbstractWidget {
                     guiGraphics.renderComponentHoverEffect(font, styleAt, mouseX, mouseY);
                 }
             }
+            guiGraphics.drawString(Minecraft.getInstance().font, "111", getX(), getY(), ChatFormatting.WHITE.getColor());
         }
 
     }

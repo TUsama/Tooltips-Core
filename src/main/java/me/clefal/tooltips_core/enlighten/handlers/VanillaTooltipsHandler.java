@@ -92,7 +92,8 @@ public class VanillaTooltipsHandler {
         Screen screen = event.getScreen();
         List<AbstractTooltipsWidget> all = ((ScreenDuck) screen).getAll();
         GuiGraphics guiGraphics = event.getGuiGraphics();
-
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0, 0, 1000);
         for (int i = 0; i < all.size(); i++) {
             AbstractTooltipsWidget tooltipsWidget = all.get(i);
             guiGraphics.pose().pushPose();
@@ -105,8 +106,8 @@ public class VanillaTooltipsHandler {
             tooltipsWidget.render(event.getGuiGraphics(), event.getMouseX(), event.getMouseY(), event.getPartialTick());
             guiGraphics.pose().popPose();
         }
-
-
+        guiGraphics.pose().popPose();
+        //move this from Screen.tick() to here, some screens don't invoke tick().
         if (!Screen.hasAltDown() && ((ScreenDuck) screen).tc$getCurrentFocusTooltips() != null) {
             ((ScreenDuck) screen).resetCurrentFocusTooltips();
         }

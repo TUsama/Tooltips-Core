@@ -50,7 +50,7 @@ public class EnlightenUtil {
                     } else {
                         //TranslatableContents also can have internal enlighten.
 
-                        if (group.matcher(copy.getString()).find()){
+                        if (isNested(comp)){
                             newComponent = revealNestedEnlighten(copy);
                         } else {
                             newComponent = copy;
@@ -63,7 +63,7 @@ public class EnlightenUtil {
                                 *///?} else {
                         PlainTextContents.LiteralContents
                                 //?}
-                                contents && group.matcher(contents.text()).find()) {
+                                contents && isNested(contents.text())) {
                     newComponent = revealNestedEnlighten(copy);
                 } else {
                     newComponent = copy;
@@ -158,18 +158,7 @@ public class EnlightenUtil {
             if (matchResults.isEmpty()) return enlighten.copy();
 
 
-
-            LinkedHashMap<String, MutableComponent> terms = LinkedHashMap.ofEntries(matchResults.map(x -> Tuple.of(
-                            x.group(1),
-                            Component.translatable(termFinder.apply(x.group(2)))
-                    ))
-                    .filter(tuple2 -> {
-                        boolean exists = ComponentUtils.isTranslationResolvable(tuple2._2());
-                        if (!exists) {
-                            TooltipsCore.LOGGER.warn("found non-exist term: {}", tuple2._2().getString());
-                        }
-                        return exists;
-                    }));
+            Map<String, Component> terms = processEnlightenArrayAsMap(matchResults.map(MatchResult::group).toJavaArray(String[]::new));
             Matcher secondMatch = group.matcher(string);
 
 
@@ -211,10 +200,10 @@ public class EnlightenUtil {
     }
 
 
-    private static Map<String, Component> resolveEnlighten(Component component) {
-        String string = component.getString();
-        String[] split = string.split(",");
-
+    private static Map<String, Component> resolveEnlighten(Component enlighten) {
+        return processEnlightenArrayAsMap(enlighten.getString().split(","));
+    }
+    private Map<String, Component> processEnlightenArrayAsMap(String[] split) {
         return Stream.of(split)
                 .filter(s -> group.asMatchPredicate().test(s))
                 .map(s -> {
@@ -232,7 +221,7 @@ public class EnlightenUtil {
                     }
                     return exists;
                 })
-                .transform(x -> x.toMap(Function.identity()));
+                .transform(x -> x.toLinkedMap(Function.identity()));
     }
 
     public static List<String> splitBySubstrings(
@@ -310,24 +299,6 @@ public class EnlightenUtil {
     }
 
 
-    public static Style extractMcFormattingCodesAsStyle(String input) {
-        Style empty = Style.EMPTY;
-        if (input == null || input.isEmpty()) {
-            return empty;
-        }
-
-        Matcher matcher = Pattern.compile("§(.)").matcher(input);
-        while (matcher.find()) {
-            ChatFormatting byCode = ChatFormatting.getByCode(matcher.group(1).charAt(0));
-
-            if (byCode != null){
-                empty = empty.applyFormat(byCode);
-            }
-        }
-
-        return empty;
-    }
-
 
     public static boolean isEnlighten(HoverEvent event) {
         return event.getAction().equals(HoverEvent.Action.SHOW_TEXT) && event.getValue(HoverEvent.Action.SHOW_TEXT).getString().contains("enlighten: ");
@@ -352,7 +323,10 @@ public class EnlightenUtil {
     }
 
     public static boolean isNested(Component component){
-        String string = component.getString();
-        return group.matcher(string).find();
+        return isNested(component.getString());
+    }
+
+    public static boolean isNested(String component){
+        return group.matcher(component).find();
     }
 }

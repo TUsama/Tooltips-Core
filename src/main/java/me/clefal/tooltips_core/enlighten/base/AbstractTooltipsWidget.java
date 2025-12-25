@@ -87,7 +87,12 @@ public abstract class AbstractTooltipsWidget extends AbstractWidget {
         if (isPositionInit){
 
             int i = 5;
+            //? 1.20.1 {
+            /*this.isHovered = mouseX >= this.getX() - i - 2 && mouseY >= this.getY() - i && mouseX < this.getX() + this.width + i && mouseY < this.getY() + this.height + i;
+            *///?} else {
             this.isHovered = guiGraphics.containsPointInScissor(mouseX, mouseY) && mouseX >= this.getX() - i - 2 && mouseY >= this.getY() - i && mouseX < this.getX() + this.width + i && mouseY < this.getY() + this.height + i;
+            //?}
+
 
             guiGraphics.blit(PIN, getX() + width, getY() - 10, 5, 5, 0, 0, 32, 32, 32, 32);
             //put this here can fix a glitch, see postRenderTooltipsWidget method.

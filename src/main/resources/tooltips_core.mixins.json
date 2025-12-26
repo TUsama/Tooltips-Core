@@ -10,7 +10,7 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "AbstractContainerScreenMixin",
-    "BakedGlyphAccessor",
+    "BakedGlyphEffectAccessor",
     "BakedGlyphMixin",
     "ClientTextTooltipAccess",
     "GuiGraphicsAccessor",
@@ -18,10 +18,11 @@
     "GuiGraphicsMixin",
     "ScreenInvoker",
     "ScreenMixin",
-    "TooltipMixin"
+    "TooltipMixin",
+    "BakedGlyphAccessor"
   ],
   "mixins": [
-    "FontMixin",
+    "StringRenderOutputMixin",
     "MutableComponentMixin"
 
   ],

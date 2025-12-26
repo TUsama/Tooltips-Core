@@ -6,8 +6,10 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.clefal.tooltips_core.enlighten.base.AbstractTooltipsWidget;
 import me.clefal.tooltips_core.enlighten.base.ComponentTooltipsWidget;
+import me.clefal.tooltips_core.enlighten.component.DashedLineEffect;
 import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
 import me.clefal.tooltips_core.enlighten.event.SaveFormattedCharSequenceEvent;
+import me.clefal.tooltips_core.enlighten.utils.DashedLineDuck;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -20,6 +22,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -38,7 +41,7 @@ import java.util.*;
 //? >1.20.1
         ,remap = false
 )
-public abstract class ScreenMixin implements ScreenDuck {
+public abstract class ScreenMixin implements ScreenDuck, DashedLineDuck {
 
 
     @Unique

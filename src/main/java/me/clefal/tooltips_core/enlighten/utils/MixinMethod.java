@@ -9,7 +9,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import lombok.experimental.UtilityClass;
 import me.clefal.tooltips_core.enlighten.component.DashedLineEffect;
 import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
-import me.clefal.tooltips_core.mixin.BakedGlyphAccessor;
+import me.clefal.tooltips_core.mixin.BakedGlyphEffectAccessor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
@@ -40,9 +40,14 @@ public class MixinMethod {
     }
 
     public static boolean tryDrawDashedLine(float u0, float v0, float u1, float v1, BakedGlyph.Effect effect, Matrix4f matrix, VertexConsumer buffer, int packedLight) {
-        if (effect instanceof DashedLineEffect && effect instanceof BakedGlyphAccessor accessor) {
-            float x0 = accessor.getX0() + 1;
-            float x1 = x0 + 4;
+        if (effect instanceof DashedLineEffect && effect instanceof BakedGlyphEffectAccessor accessor) {
+            float x0 = accessor.getX0();
+            float x1 = accessor.getX1();
+
+            if (x1 - x0 >= 4) {
+                x0 = accessor.getX0() + 1;
+                x1 = x0 + 4;
+            }
 
             //? 1.20.1 {
             /*buffer.vertex(matrix, x0, accessor.getY0(), accessor.getDepth())
@@ -104,6 +109,27 @@ public class MixinMethod {
             List<FormattedCharSequence> split = new ArrayList<>(font.split(component1, Math.max(width / 2, 200)));
             split.add(FormattedCharSequence.EMPTY);
             original.call(instance, font, split, mouseX, mouseY);
+        }
+    }
+
+    public static boolean injectDashedLine(Font.StringRenderOutput instance, BakedGlyph.Effect effect, Operation<Void> original, float f3, float f, float f1, float f2, float f6, float f7, Style style, float x, float y) {
+        HoverEvent hoverEvent = style.getHoverEvent();
+        if (hoverEvent != null && EnlightenUtil.isEnlighten(hoverEvent)) {
+            DashedLineEffect dashedLineEffect = new DashedLineEffect(x + f7 - 1.0F, y + f7 + 9.0F, x + f7 + f6, y + f7 + 9.0F - 1.0F, 0.01F, f, f1, f2, f3);
+            ((DashedLineDuck) instance).mergeEffect(style, dashedLineEffect);
+            return true;
+
+        } else {
+            //call this cuz I wanna init the this.effect.
+            original.call(instance, effect);
+            return false;
+        }
+
+    }
+
+    public static void renderAllDashedLine(Font.StringRenderOutput output, BakedGlyph bakedglyph, Matrix4f matrix, VertexConsumer buffer, int packedLight) {
+        for (DashedLineEffect dashedLineEffect : ((DashedLineDuck) output).getAllEffect()) {
+            dashedLineEffect.render(bakedglyph, matrix, buffer, packedLight);
         }
     }
 }

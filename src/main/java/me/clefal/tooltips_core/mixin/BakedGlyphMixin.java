@@ -1,6 +1,7 @@
 package me.clefal.tooltips_core.mixin;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import me.clefal.tooltips_core.enlighten.component.DashedLineEffect;
 import me.clefal.tooltips_core.enlighten.utils.MixinMethod;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 import org.joml.Matrix4f;
@@ -34,8 +35,8 @@ public class BakedGlyphMixin {
     private float v1;
 
     @Inject(method = "renderEffect", at = @At(value = "HEAD"), cancellable = true)
-    private void tc$tickRemoveCurrent(BakedGlyph.Effect effect, Matrix4f matrix, VertexConsumer buffer, int packedLight, CallbackInfo ci) {
-        if (MixinMethod.tryDrawDashedLine(u0, v0, u1, v1, effect, matrix, buffer, packedLight)) {
+    private void tc$tryDrawDashedLine(BakedGlyph.Effect effect, Matrix4f matrix, VertexConsumer buffer, int packedLight, CallbackInfo ci) {
+        if (effect instanceof DashedLineEffect) {
             ci.cancel();
         }
     }

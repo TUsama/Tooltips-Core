@@ -28,7 +28,7 @@ public class DashedLineEffect extends BakedGlyph.Effect {
             float v0 = bakedglyph1.getV0();
             float v1 = bakedglyph1.getV1();
             float length = 4.0f;
-            while (x0 + length <= accessor.getX1() + 2) {
+            while (x0 + length <= accessor.getX1() + 6) {
                 float x1 = Math.min(x0 + length, accessor.getX1());
                 //? 1.20.1 {
                 /*buffer.vertex(matrix, x0, accessor.getY0(), accessor.getDepth())

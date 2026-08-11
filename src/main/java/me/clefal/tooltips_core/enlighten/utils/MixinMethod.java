@@ -8,6 +8,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import lombok.experimental.UtilityClass;
 import me.clefal.tooltips_core.enlighten.component.DashedLineEffect;
+import me.clefal.tooltips_core.enlighten.component.EnlightenStyle;
 import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
 import me.clefal.tooltips_core.mixin.BakedGlyphEffectAccessor;
 import net.minecraft.client.gui.Font;
@@ -99,7 +100,7 @@ public class MixinMethod {
     }
 
     public static void revealOnHover(GuiGraphics instance, Font font, int mouseX, int mouseY, Operation<Void> original, Component component, ItemStack stack, int width) {
-        var tuple2 = EnlightenUtil.trimEnlighten(component);
+        var tuple2 = EnlightenStyle.trimEnlighten(component);
 
         Component component1 = ((Component) EnlightenUtil.reveal(tuple2._2).get(0));
 
@@ -114,7 +115,8 @@ public class MixinMethod {
 
     public static boolean injectDashedLine(Font.StringRenderOutput instance, BakedGlyph.Effect effect, Operation<Void> original, float f3, float f, float f1, float f2, float f6, float f7, Style style, float x, float y) {
         HoverEvent hoverEvent = style.getHoverEvent();
-        if (hoverEvent != null && EnlightenUtil.isEnlighten(hoverEvent)) {
+        if (hoverEvent != null && EnlightenStyle.isEnlighten(hoverEvent)) {
+            //System.out.println("x is " + x);
             DashedLineEffect dashedLineEffect = new DashedLineEffect(x + f7 - 1.0F, y + f7 + 9.0F, x + f7 + f6, y + f7 + 9.0F - 1.0F, 0.01F, f, f1, f2, f3);
             ((DashedLineDuck) instance).mergeEffect(style, dashedLineEffect);
             return true;
@@ -131,5 +133,6 @@ public class MixinMethod {
         for (DashedLineEffect dashedLineEffect : ((DashedLineDuck) output).getAllEffect()) {
             dashedLineEffect.render(bakedglyph, matrix, buffer, packedLight);
         }
+        ((DashedLineDuck) output).getEffect().clear();
     }
 }

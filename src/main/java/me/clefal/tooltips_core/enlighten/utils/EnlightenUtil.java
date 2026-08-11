@@ -1,332 +1,86 @@
 package me.clefal.tooltips_core.enlighten.utils;
 
-import com.clefal.nirvana_lib.relocated.io.vavr.Tuple;
-import com.clefal.nirvana_lib.relocated.io.vavr.Tuple2;
-import com.clefal.nirvana_lib.relocated.io.vavr.collection.LinkedHashMap;
-import com.clefal.nirvana_lib.relocated.io.vavr.collection.Map;
-import com.clefal.nirvana_lib.relocated.io.vavr.collection.Set;
-import com.clefal.nirvana_lib.relocated.io.vavr.collection.Stream;
 import lombok.experimental.UtilityClass;
-import me.clefal.tooltips_core.TooltipsCore;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.*;
-        //? 1.20.1 {
-/*import net.minecraft.network.chat.contents.LiteralContents;
-        *///?} else {
-import net.minecraft.network.chat.contents.PlainTextContents;
-        //?}
-
-
+import me.clefal.tooltips_core.enlighten.component.EnlightenResolution;
+import me.clefal.tooltips_core.enlighten.resolver.EnlightenComponentBuilder;
+import me.clefal.tooltips_core.enlighten.resolver.InlineEnlightenResolver;
+import me.clefal.tooltips_core.enlighten.resolver.TranslationEnlightenResolver;
+import me.clefal.tooltips_core.enlighten.syntax.EnlightenSyntax;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
 @UtilityClass
 public class EnlightenUtil {
-    private static final Function<String, String> getEnlighten = string -> string + ".enlighten";
-    private static final Function<String, String> termFinder = s -> "enlighten.term." + s;
-    private static Pattern group = Pattern.compile("\\[([^\\]]+)\\]\\(([^)]+)\\)");
 
     public static List<? extends FormattedText> reveal(Component component) {
         return reveal(List.of(component));
     }
 
-    public static List<? extends FormattedText> reveal(List<? extends FormattedText> components) {
-        List<FormattedText> formattedTexts = new ArrayList<>();
-        for (FormattedText component : components) {
-
-            if (component instanceof MutableComponent comp) {
-                Component newComponent;
-                MutableComponent copy = comp.copy();
-                copy.getSiblings().clear();
-                if (comp.getContents() instanceof TranslatableContents contents) {
-                    if (I18n.exists(getEnlighten.apply(contents.getKey()))) {
-                        newComponent = resolveEnlightenComponent(copy, Component.translatable(getEnlighten.apply(contents.getKey())));
-                    } else {
-                        //TranslatableContents also can have internal enlighten.
-
-                        if (isNested(comp)){
-                            newComponent = revealNestedEnlighten(copy);
-                        } else {
-                            newComponent = copy;
-                        }
-                    }
-
-                } else if (comp.getContents() instanceof
-                        //? 1.20.1 {
-                        /*LiteralContents
-                                *///?} else {
-                        PlainTextContents.LiteralContents
-                                //?}
-                                contents && isNested(contents.text())) {
-                    newComponent = revealNestedEnlighten(copy);
-                } else {
-                    newComponent = copy;
-                }
-
-                tryAppendSiblings(comp, newComponent);
-                formattedTexts.add(newComponent);
-
-            } else {
-                formattedTexts.add(component);
-            }
-
-
-        }
-        return formattedTexts;
-    }
-
-    private static void tryAppendSiblings(MutableComponent comp, Component newComponent) {
-        if (!comp.getSiblings().isEmpty()) {
-            ArrayList<Component> oldSiblings = new ArrayList<>(comp.getSiblings());
-            //if the comp hasn't been modified, we can simply clear its siblings and add the new handled siblings to it.
-            for (FormattedText formattedText : reveal(oldSiblings)) {
-                if (formattedText instanceof Component component1) newComponent.getSiblings().add(component1);
-            }
-
-        }
-    }
-
-    private static MutableComponent resolveEnlightenComponent(MutableComponent target, Component enlighten) {
-        Map<String, Component> enlightenMap = resolveEnlighten(enlighten);
-        return handleWholeComponent(target, enlightenMap);
-    }
-
-    private static MutableComponent handleWholeComponent(MutableComponent target, Map<String, Component> enlightenMap) {
-        Set<String> strings = enlightenMap.keySet();
-        if (strings.contains("*")){
-            MutableComponent copy = target.copy();
-            copy.withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(enlightenMap.get("*").get()))).withUnderlined(true));
-            return copy;
-        }
-        Optional<Map<String, Component>> tuple2s = ((MutableComponentDuck) target).tooltips_Core$grabEligibles((style, content) -> {
-            List<String> javaList = strings.filter(content::contains)
-                    .toJavaList();
-            if (javaList.isEmpty()) {
-                return Optional.empty();
-            } else {
-                return Optional.of(javaList);
-            }
-        }, Style.EMPTY, enlightenMap);
-        if (tuple2s.isPresent()) {
-            Map<String, Component> tuple2s1 = tuple2s.get();
-            Set<String> matched = tuple2s1.keySet();
-            MutableComponent newComp = MutableComponent.create(target.getContents());
-            String string = newComp.getString();
-
-
-            string = string.replaceAll("§.", "");
-
-
-            List<Tuple2<String, Style>> results = consumeStyle(splitBySubstrings(string, matched.toJavaList()));
-            if (!results.isEmpty()) {
-                MutableComponent beginning = Component.literal("");
-                Style lastStyle = target.getStyle();
-                for (int i = 0; i < results.size(); i++) {
-                    String s1 = results.get(i)._1;
-                    lastStyle = results.get(i)._2.isEmpty() ? lastStyle : results.get(i)._2;
-                    Style finalLastStyle = lastStyle;
-                    strings.find(s1::contains)
-                            .onEmpty(() -> beginning.append(Component.literal(s1).withStyle(finalLastStyle)))
-                            .forEach(x -> {
-                                beginning.append(Component.literal(s1).withStyle(finalLastStyle.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(tuple2s1.get(x).get()))).withUnderlined(true)));
-                            });
-
-                }
-                return beginning;
-            } else {
-                TooltipsCore.LOGGER.warn("Fail at splitting target: {}, the result string list is empty.", target.getString());
-                return target;
-            }
-
-        } else {
-            TooltipsCore.LOGGER.debug("Component '{}' has its enlighten, but none of the enlighten can be found in its string.", target.getString());
-            return target;
-        }
-    }
-
-    public static Component revealNestedEnlighten(Component enlighten){
-        if (enlighten.getSiblings().isEmpty()) {
-            String string = enlighten.getString();
-            Matcher matcher = group.matcher(string);
-            Stream<MatchResult> matchResults = Stream.ofAll(matcher.results());
-            if (matchResults.isEmpty()) return enlighten.copy();
-
-
-            Map<String, Component> terms = processEnlightenArrayAsMap(matchResults.map(MatchResult::group).toJavaArray(String[]::new));
-            Matcher secondMatch = group.matcher(string);
-
-
-            StringBuilder sb = new StringBuilder();
-            while (secondMatch.find()) {
-                secondMatch.appendReplacement(sb, secondMatch.group(1));
-            }
-            secondMatch.appendTail(sb);
-            string = sb.toString();
-
-            Set<String> strings = terms.keySet();
-
-
-            List<Tuple2<String, Style>> results = consumeStyle(splitBySubstrings(string, strings));
-            if (!results.isEmpty()) {
-
-                MutableComponent beginning = Component.literal("");
-                Style lastStyle = enlighten.getStyle();
-                for (int i = 0; i < results.size(); i++) {
-                    String s1 = results.get(i)._1;
-                    lastStyle = results.get(i)._2.isEmpty() ? lastStyle : results.get(i)._2;
-                    Style finalLastStyle = lastStyle;
-                    strings.find(s1::contains)
-                            .onEmpty(() -> beginning.append(Component.literal(s1).withStyle(finalLastStyle)))
-                            .forEach(x -> {
-                                beginning.append(Component.literal(s1).withStyle(finalLastStyle.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("enlighten: ").append(terms.get(x).get()))).withUnderlined(true)));
-                            });
-                }
-                return beginning;
-            } else {
-                TooltipsCore.LOGGER.warn("Fail at splitting target: {}, the result string list is empty.", enlighten.getString());
-                return enlighten;
-            }
-        } else {
-            throw new RuntimeException("revealNestedEnlighten can only handle Component which don't have any sibling!");
-        }
-
-
-    }
-
-
-    private static Map<String, Component> resolveEnlighten(Component enlighten) {
-        return processEnlightenArrayAsMap(enlighten.getString().split(","));
-    }
-    private Map<String, Component> processEnlightenArrayAsMap(String[] split) {
-        return Stream.of(split)
-                .filter(s -> group.asMatchPredicate().test(s))
-                .map(s -> {
-                    Matcher matcher = group.matcher(s);
-                    matcher.find();
-                    return Tuple.of(
-                            matcher.group(1),
-                            Component.translatable(termFinder.apply(matcher.group(2)))
-                    );
-                })
-                .filter(tuple2 -> {
-                    boolean exists = ComponentUtils.isTranslationResolvable(tuple2._2());
-                    if (!exists) {
-                        TooltipsCore.LOGGER.warn("found non-exist term: {}", tuple2._2().getString());
-                    }
-                    return exists;
-                })
-                .transform(x -> x.toLinkedMap(Function.identity()));
-    }
-
-    public static List<String> splitBySubstrings(
-            String input,
-            Iterable<String> patterns
+    public static List<? extends FormattedText> reveal(
+            List<? extends FormattedText> components
     ) {
-        List<String> result = new ArrayList<>();
-        int index = 0;
+        List<FormattedText> result = new ArrayList<>();
 
-        List<Pattern> compiled = new ArrayList<>();
-        for (String p : patterns) {
-            if (p != null && !p.isEmpty()) {
-                compiled.add(compileMcPattern(p));
-            }
-        }
-
-        while (index < input.length()) {
-            int matchIndex = -1;
-            Matcher best = null;
-
-            for (Pattern pattern : compiled) {
-                Matcher m = pattern.matcher(input);
-                if (m.find(index)) {
-                    if (matchIndex == -1 || m.start() < matchIndex) {
-                        matchIndex = m.start();
-                        best = m;
-                    }
-                }
+        for (FormattedText text : components) {
+            if (!(text instanceof MutableComponent component)) {
+                result.add(text);
+                continue;
             }
 
-            if (best == null) {
-                result.add(input.substring(index));
-                break;
-            }
-
-            if (best.start() > index) {
-                result.add(input.substring(index, best.start()));
-            }
-
-            result.add(best.group());
-
-            index = best.end();
+            result.add(revealComponent(component));
         }
 
         return result;
     }
 
-    private static Pattern compileMcPattern(String literal) {
-        String regex = "(?:§.)*" + Pattern.quote(literal);
-        return Pattern.compile(regex);
+    private static Component revealComponent(MutableComponent component) {
+        MutableComponent body = component.copy();
+        body.getSiblings().clear();
+
+        Component result = resolveBody(body);
+
+        appendResolvedSiblings(component, result);
+
+        return result;
     }
 
-    private static List<Tuple2<String, Style>> consumeStyle(List<String> styledStrings){
+    private static Component resolveBody(
+            MutableComponent component
+    ) {
+        EnlightenResolution resolution = null;
 
-        ArrayList<Tuple2<String, Style>> results = new ArrayList<>();
-        Pattern compile = Pattern.compile("^(§.)+");
-        for (String styledString : styledStrings) {
-            results.add(Tuple.of(styledString.replaceAll("^(§.)+", ""), Stream.ofAll(compile.matcher(styledString).results()
-                    .map(x -> Arrays.stream(x.group().split("§"))
-                            .filter(string -> !string.isBlank())
-                            .map(string -> ChatFormatting.getByCode(string.charAt(0))).toList()))
-                    .transform(x -> {
-                        Style empty = Style.EMPTY;
-                        for (List<ChatFormatting> chatFormattings : x) {
-                            for (ChatFormatting chatFormatting : chatFormattings) {
-                                empty = empty.applyFormat(chatFormatting);
-                            }
-                        }
-                        return empty;
-                    })
-
-            ));
+        if (component.getContents() instanceof TranslatableContents contents) {
+            if (TranslationEnlightenResolver.canResolve(contents)) {
+                resolution = TranslationEnlightenResolver.resolve(component, contents);
+            } else if (EnlightenSyntax.containsInline(component.getString())) {
+                resolution = InlineEnlightenResolver.resolve(component);
+            }
+        } else if (
+                EnlightenSyntax.containsInline(component.getString())
+        ) {
+            resolution = InlineEnlightenResolver.resolve(component);
         }
-        return results;
-    }
 
-
-
-    public static boolean isEnlighten(HoverEvent event) {
-        return event.getAction().equals(HoverEvent.Action.SHOW_TEXT) && event.getValue(HoverEvent.Action.SHOW_TEXT).getString().contains("enlighten: ");
-    }
-
-    public static Tuple2<Boolean, Component> trimEnlighten(Component text) {
-        MutableComponent copy = text.copy();
-        //? 1.20.1 {
-        /*if (copy.getContents() instanceof LiteralContents contents && contents.text().equals("enlighten: "))
-            *///?} else {
-        if (copy.getContents() instanceof PlainTextContents.LiteralContents contents && contents.text().equals("enlighten: "))
-        //?}
-
-        {
-            MutableComponent empty = Component.empty();
-            empty.getSiblings().addAll(copy.getSiblings());
-            empty.withStyle(copy.getStyle());
-            copy = empty;
-            return Tuple.of(true, copy);
+        if (resolution == null) {
+            return component;
         }
-        return Tuple.of(false, text);
+
+        return EnlightenComponentBuilder.build(resolution, component.getStyle());
     }
 
-    public static boolean isNested(Component component){
-        return isNested(component.getString());
-    }
-
-    public static boolean isNested(String component){
-        return group.matcher(component).find();
+    private static void appendResolvedSiblings(
+            MutableComponent original,
+            Component result
+    ) {
+        for (FormattedText sibling : reveal(original.getSiblings())) {
+            if (sibling instanceof Component component) {
+                result.getSiblings().add(component);
+            }
+        }
     }
 }

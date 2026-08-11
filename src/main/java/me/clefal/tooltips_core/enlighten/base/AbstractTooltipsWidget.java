@@ -6,6 +6,7 @@ import com.google.common.collect.HashBiMap;
 import lombok.Getter;
 import me.clefal.tooltips_core.TooltipsCore;
 import me.clefal.tooltips_core.config.TooltipsCoreConfig;
+import me.clefal.tooltips_core.enlighten.component.EnlightenStyle;
 import me.clefal.tooltips_core.enlighten.event.DirectlyAddEnlightenToFixedEvent;
 import me.clefal.tooltips_core.enlighten.utils.EnlightenUtil;
 import me.clefal.tooltips_core.enlighten.utils.ScreenDuck;
@@ -124,7 +125,7 @@ public abstract class AbstractTooltipsWidget extends AbstractWidget {
 
     protected void onLeftClick(double mouseX, double mouseY) {
         Style styleAt = getStyleAt(mouseX, mouseY, Minecraft.getInstance().font);
-        if (styleAt!= null && styleAt.getHoverEvent() != null && EnlightenUtil.isEnlighten(styleAt.getHoverEvent())){
+        if (styleAt!= null && styleAt.getHoverEvent() != null && EnlightenStyle.isEnlighten(styleAt.getHoverEvent())){
             Component value = styleAt.getHoverEvent().getValue(HoverEvent.Action.SHOW_TEXT);
             if (value != null){
                 Option<AbstractTooltipsWidget> sameTargetWidget = getSameTargetWidget(screen, styleAt.hashCode());

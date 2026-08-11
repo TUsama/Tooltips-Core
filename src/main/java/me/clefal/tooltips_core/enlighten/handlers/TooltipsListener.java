@@ -2,6 +2,7 @@ package me.clefal.tooltips_core.enlighten.handlers;
 
 import com.clefal.nirvana_lib.relocated.io.vavr.Tuple2;
 import com.clefal.nirvana_lib.relocated.net.neoforged.bus.api.SubscribeEvent;
+import me.clefal.tooltips_core.enlighten.component.EnlightenStyle;
 import me.clefal.tooltips_core.enlighten.event.DirectlyAddEnlightenToFixedEvent;
 import me.clefal.tooltips_core.enlighten.event.SaveCurrentComponentsEvent;
 import me.clefal.tooltips_core.enlighten.event.SaveFormattedCharSequenceEvent;
@@ -28,7 +29,7 @@ public class TooltipsListener {
             List<FormattedText> list = event.components.stream().map(x -> {
                         if (x instanceof Component component) {
 
-                            Tuple2<Boolean, Component> tuple2 = EnlightenUtil.trimEnlighten(component);
+                            Tuple2<Boolean, Component> tuple2 = EnlightenStyle.trimEnlighten(component);
                             if (tuple2._1) {
                                 //System.out.println(tuple2._2);
                                 return tuple2._2;
